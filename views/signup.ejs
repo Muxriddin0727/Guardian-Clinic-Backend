@@ -1,0 +1,245 @@
+<%- include('includes/header') %>
+
+<link rel="stylesheet" type="text/css" href="/css/sign-up.css" />
+
+<body>
+  <form
+    onsubmit="return validateSignupForm()"
+    class="login_container"
+    action="/secured/sign-up"
+    method="POST"
+    enctype="multipart/form-data"
+  >
+    <div class="login_frame" style="width: 1320px; height: 1073px">
+      <div>
+        <a href="/secured"
+          ><img style="height: 50%" alt="Logo" src="/images/logo.png"
+        /></a>
+      </div>
+      <div class="login_top">
+        <span> Membership Aplication </span>
+        <div>To apply as a specialist please complete all the fields.</div>
+        <p>
+          Already have an account?
+          <a href="/secured/login" style="color: #2094ff">Login</a>
+        </p>
+      </div>
+
+      <div class="sign_input_frame">
+        <div class="sign_up_frame">
+          <label for="">First Name</label>
+          <input
+            type="text"
+            name="mb_name"
+            class="mb_first_name"
+            placeholder="James"
+            value=""
+            required
+          />
+        </div>
+        <div class="sign_up_frame">
+          <label for="">Last Name</label>
+          <input
+            type="text"
+            name="mb_last_name"
+            class="mb__last_name"
+            placeholder="Smith"
+            value=""
+          />
+        </div>
+      </div>
+
+      <div class="sign_input_frame">
+        <div class="sign_up_frame">
+          <label for="">Username*</label>
+          <input
+            type="text"
+            name="mb_username"
+            class="mb_username"
+            placeholder="Jose"
+            value=""
+          />
+        </div>
+
+        <div class="sign_up_frame">
+          <label for="">Email Address* </label>
+          <input
+            type="text"
+            name="mb_email"
+            class="mb_email"
+            placeholder="muxriddin99@hotmail.com"
+            value=""
+            required
+          />
+        </div>
+      </div>
+
+      <div class="sign_input_frame">
+        <div class="sign_up_frame">
+          <label for="expr"> Experience</label>
+          <textarea
+            id="expr"
+            name="expr"
+            class="mb_expr"
+            placeholder="List your previous experiences"
+          ></textarea>
+        </div>
+
+        <div class="sign_up_frame">
+          <label for="expr"> Degree</label>
+          <textarea
+            type="text"
+            id="degree"
+            name="degree"
+            class="mb_degree"
+            placeholder="List your dagrees"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="sign_input_frame">
+        <div class="sign_up_frame">
+          <label for="profession"> Select your profession</label>
+          <select id="mb_profession" name="mb_profession" class="mb_profession" placeholder = "NUTRUITIONIST">
+            <option value="none" selected>Profession</option>
+            <% professions.forEach(function(profession) { %>
+              <option value="<%= profession %>"><%= profession %></option>
+            <% }); %>
+          </select>
+        </div>
+
+        <div class="sign_up_frame">
+          <label for="gender"> Select your gender</label>
+          <select id="gender" name="gender" class="mb_gender">
+            <option value="none" selected>Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sign_input_frame">
+        <div class="sign_up_frame">
+          <label for="">Password*</label>
+          <input
+            type="password"
+            name="mb_password"
+            class="mb_password"
+            placeholder="*******"
+            value=""
+            required
+          />
+        </div>
+        <div class="sign_up_frame">
+          <label for="">Confirm Password*</label>
+          <input
+            type="password"
+            name="mb_confirm_password"
+            class="mb_confirm_password"
+            placeholder="*******"
+            value=""
+            required
+          />
+        </div>
+      </div>
+
+      <div class="image_input_frame">
+        <div class="media-frame">
+          <img class="upload_img_frame" src="/images/default_doctor.jpg" />
+          <div class="upload_container">
+            <span class="media_text">Member Image</span>
+            <div class="filebox bs3-primary preview-image">
+              <input
+                class="upload-name"
+                value="    Choose File"
+                disabled="disabled"
+              />
+              <label for="input_file">Add Image</label>
+              <input
+                type="file"
+                id="input_file"
+                name="doctor_img"
+                class="upload-hidden form-control-file doctor_img"
+              />
+            </div>
+            <p class="thumbnail_desc">
+              ! Supported image types: PNG, JPG, JPEG
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <button class="login_btn" name="signup" type="submit">Sign up</button>
+
+      <div class="container_1">
+        <div class="pagination p5">
+          <ul>
+            <a href="/secured/login"><li></li></a>
+            <a href="/secured/sign-up"><li></li></a>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </form>
+</body>
+
+<script>
+  $(function () {
+    let fileTarget = $(".filebox .upload-hidden");
+    let filename = "";
+    fileTarget.on("change", function () {
+      if (window.FileReader) {
+        const uploading_file = $(this)[0].files[0];
+        const fileType = uploading_file["type"];
+        const validImageTypes = ["image/jpg", "image/jpeg", "image/png"];
+        if (!validImageTypes.includes(fileType)) {
+          alert(" ! Supported image types: PNG, JPG, JPEG");
+        } else {
+          if (uploading_file) {
+            console.log(URL.createObjectURL(uploading_file));
+            $(".upload_img_frame")
+              .attr("src", URL.createObjectURL(uploading_file))
+              .addClass("success");
+          }
+          filename = uploading_file.name;
+        }
+      }
+
+      $(this).siblings(".upload-name").val(filename);
+    });
+  });
+
+  function validateSignupForm() {
+    const mb_username = $(".mb_username").val();
+    const mb_last_name = $(".mb_last_name").val();
+    const mb_name = $(".mb_firstname").val();
+    const mb_email = $(".mb_email").val();
+    const mb_password = $(".mb_password").val();
+    const mb_confirm_password = $(".mb_confirm_password").val();
+    const doctor_img = $(".doctor_img").get(0).files[0] ?? null;
+
+    if (
+      mb_username == "" ||
+      mb_last_name == "" ||
+      mb_name == "" ||
+      mb_email == "" ||
+      mb_password == "" ||
+      mb_confirm_password == ""
+    ) {
+      alert("Iltimos hamma ma'lumotlarni kiriting1!");
+      return false;
+    } else if (mb_password !== mb_confirm_password) {
+      alert(`Iltimos passwordni to'g'ri kiriting!`);
+      return false;
+    }
+
+    if (!doctor_img) {
+      alert("Iltimos rasmni yuklang!");
+      return false;
+    }
+
+    return true;
+  }
+</script>
+
+<%- include('includes/footer') %>

@@ -1,0 +1,43 @@
+<%- include('includes/header') %>
+<link rel="stylesheet" type="text/css" href="/css/login.css" />
+<body>
+  <form action="/secured/login" class="login_container" method="POST">
+    <div class="login_frame" style="height: 460px">
+      <div class="login_top">
+        <span>WELCOME</span>
+        <div>
+          Back to <a href="/secured" style="color: #6440fb">Home</a>
+        </div>
+        <p>
+          Don't have an account?
+          <a href="/secured/sign-up" style="color: #6440fb">Register</a>
+        </p>
+      </div>
+      <div class="login_input_frame">
+        <div class="login_input_container">
+          <label> Please, insert your  username </label>
+          <input
+            placeholder="Foydalanuvchining ismi"
+            type="text"
+            value=""
+            name="mb_username"
+            required
+          />
+        </div>
+        <div class="login_input_container">
+          <label> Please insert your password </label>
+          <input
+            placeholder="Password"
+            type="password"
+            value=""
+            name="mb_password"
+            required
+          />
+        </div>
+      </div>
+      <button class="login_btn btn" name="login" type="submit">LogIn</button>
+    </div>
+  </form>
+</body>
+
+<%- include('includes/footer') %>
