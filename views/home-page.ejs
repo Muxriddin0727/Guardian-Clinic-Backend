@@ -1,0 +1,161 @@
+<%- include('includes/header') %>
+
+<link rel = "stylesheet" type ="text/css" href="css/home.css" href="https://fonts.googleapis.com/css?family=Noto Sans"/>
+
+<body>
+    <div class="group_name">
+        <ul class="nav justify-content-center">
+          <li class="nav-item" style="cursor: pointer">
+            <a class="nav-link active" href="/secured">Home</a>
+          </li>
+           
+          <% if(!member){%>
+            <li class="nav-item" style="cursor: pointer">
+              <a class="nav-link" href="/secured/sign-up">Signup</a>
+            </li>
+            <li class="nav-item" style="cursor: pointer">
+              <a class="nav-link"  href="/secured/login">Login</a>
+            </li>
+            <% } else if(member.mb_type==='ADMIN'){ %>
+            <li class="nav-item" style="cursor: pointer">
+              <a class="nav-link" href="/secured/all-doctor">AllTrad</a>
+            </li>
+            <li
+            class="nav-item"
+            style="cursor: pointer"
+            onclick="return confirm('Do you want to log out?')"
+          >
+            <a class="nav-link"  href="/secured/logout">Logout</a>
+          </li>
+          <% } else { %>
+          <li class="nav-item" style="cursor: pointer">
+            <a class="nav-link" href="/secured/doctor/dashboard">MyPage</a>
+          </li>
+          <li
+          class="nav-item"
+          style="cursor: pointer"
+          onclick="return confirm('Do you want to log out?')"
+        >
+          <a class="nav-link" href="/secured/logout">Logout</a>
+        </li>
+        <% } %>
+      </ul>
+
+    </div>
+
+  
+    </div>
+  
+ 
+    </div>
+    <div class="center">
+      <div class="space"></div>
+      <div class="space"></div>
+      <div class="box-info">
+       
+      </div>
+      <div class="box-data">
+        <div class="box">
+          <h4 class="info">Join Our Team of Medical Visionaries</h4>
+          <ul>
+            <li><strong> </strong><span></span></li>
+            <li><strong>Are you a compassionate and dedicated medical professional looking to shape the future of healthcare? At [Your Medical Consulting Brand], <br>we believe in the power of innovation and collaboration to transform the healthcare landscape. We invite you to become a part of our dynamic <br> team of medical visionaries who are committed to making a positive impact on patient care and the medical field as a whole.</strong></li>
+            <h4 class="info">Why Choose MedCall for Your Career?</h4>
+            <li><strong>Innovative Approach: </strong><span> We are pioneers in leveraging technology to bridge the gap between patients and healthcare providers. As a member of our team,<br> you will have the opportunity to harness the latest advancements in telemedicine and digital healthcare to redefine patient care..</span></li>
+            <li><strong>Patient-Centric Focus: </strong><span>Our core mission revolves around putting patients first. You'll be a part of a team that is dedicated to delivering the highest standard of care and ensuring that patients receive the support they need, when they need it.</span></li>
+            <li><strong>Flexible Work Environment: </strong><span> We understand the importance of work-life balance. With flexible work arrangements and telemedicine capabilities, you can practice medicine on your terms while maintaining a fulfilling personal life..</span></li>
+            <li><strong>Collaborative Network: </strong><span>Join a community of like-minded healthcare professionals who are passionate about making a difference. Our platform facilitates collaboration and knowledge sharing among medical experts from various specialties.</span></li>
+          </ul>
+        </div>
+     
+      </div>
+    </div>
+    <ul id="scene" data-friction-x="0.03" data-friction-y="0.05">
+      <li class="layer" id="specks" data-depth="0.1"></li>
+      <li class="layer" id="layer-1" data-depth="0.15">
+        <div class="img" id="img-1"></div>
+      </li>
+      <li class="layer" id="layer-2" data-depth="0.25">
+        <div class="img" id="img-2"></div>
+      </li>
+      <li class="layer" id="layer-3" data-depth="0.45">
+        <div class="img" id="img-3"></div>
+      </li>
+    </ul>
+    <!-- partial -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/parallax/2.1.3/jquery.parallax.min.js'></script>
+      
+     </div>
+
+          
+  <script>
+    //SLIDER
+let speed = 400;
+
+$(document).ready(function () {
+  var imgCount = $('.img').length;
+  $("#slider").on("change", function () {
+    for (let i = 1; i <= imgCount; i++) {
+      speed = 201 - this.value;
+      $('#range').text(`1000px / ${speed / 10}s`);
+      speed = speed * (i / 1.25);
+      $('#img-' + i).css({
+        'animation-duration': speed + 's',
+        'animation-name': 'float' });
+
+    }
+  });
+});
+
+
+
+
+let count = 0;
+let thisCount = 0;
+
+const handlers = {
+ startInitFunctionOrder(data)
+ {
+     count = data.count;
+
+     document.querySelector('.letni h3').innerHTML += emoji[data.type][data.order - 1] || '';
+ },
+
+ initFunctionInvoking(data)
+ {
+     document.querySelector('.thingy').style.left = '0%';
+     document.querySelector('.thingy').style.width = ((data.idx / count) * 100) + '%';
+ },
+
+ startDataFileEntries(data)
+ {
+     count = data.count;
+
+     document.querySelector('.letni h3').innerHTML += "\u{1f358}";
+ },
+
+ performMapLoadFunction(data)
+ {
+     ++thisCount;
+
+     document.querySelector('.thingy').style.left = '0%';
+     document.querySelector('.thingy').style.width = ((thisCount / count) * 100) + '%';
+ },
+
+ onLogLine(data)
+ {
+     document.querySelector('.letni p').innerHTML = data.message + "..!";
+ }
+};
+
+window.addEventListener('message', function(e)
+{
+ (handlers[e.data.eventName] || function() {})(e.data);
+});
+
+  </script>
+    
+</body>
+
+<%- include('includes/footer') %>

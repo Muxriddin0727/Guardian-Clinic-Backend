@@ -1,0 +1,360 @@
+html,
+body {
+  height:100%;
+  width: 100%;
+  
+}
+
+
+
+
+.login_container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #F8FFFF;
+}
+
+
+
+.login_container .login_frame {
+  position: relative;
+  width: 1320px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #F8FFFF;
+  padding: 20px;
+  border-radius: 30px;
+ 
+}
+
+.login_frame .login_top {
+  position: relative;
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.login_top span {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 34px;
+}
+
+.login_top p {
+  margin-top: 15px;
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 26px;
+}
+
+.login_top div {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 26px;
+}
+
+.login_frame .login_input_frame {
+  position: relative;
+  width: 410px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.login_frame .image_input_frame {
+  position: relative;
+  width: 470px;
+  height: auto;
+  display: flex;
+  gap: 200px;
+}
+
+
+.login_input_container {
+  position: relative;
+  margin-top: 15px;
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.login_input_container label {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 18px;
+}
+
+.login_input_container input {
+  position: relative;
+  margin-top: 10px;
+  padding-left: 20px;
+  width: 100%;
+  height: 55px;
+  background: #D8FCFE;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+}
+
+.login_frame .login_btn {
+  position: relative;
+  margin-top: 25px;
+  width: 120px;
+  height: 50px;
+  background: #33a0ff;
+  border-radius: 10px;
+  margin-left: 1150px;
+
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 33px;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+p, li, a{
+  font-size: 14px;
+}
+
+
+/* GRID */
+
+.twelve { width: 100%; }
+.eleven { width: 91.53%; }
+.ten { width: 83.06%; }
+.nine { width: 74.6%; }
+.eight { width: 66.13%; }
+.seven { width: 57.66%; }
+.six { width: 49.2%; }
+.five { width: 40.73%; }
+.four { width: 32.26%; }
+.three { width: 23.8%; }
+.two { width: 15.33%; }
+.one { width: 6.866%; }
+
+/* COLUMNS */
+
+.col {
+	display: block;
+	float:left;
+	margin: 1% 0 1% 1.6%;
+}
+
+.col:first-of-type {
+  margin-left: 0;
+}
+
+.container_1{
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+}
+
+/* CLEARFIX */
+
+.cf:before,
+.cf:after {
+    content: " ";
+    display: table;
+}
+
+.cf:after {
+    clear: both;
+}
+
+.cf {
+    zoom: 1;
+}
+
+/* GENERAL STYLES */
+
+.pagination{
+  padding: 15px 0;
+}
+
+.pagination ul{
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.pagination a{
+  position:relative ;
+  display: inline-block;
+  padding: 10px 18px;
+  color: #222;
+}
+
+
+/* FIVE */
+
+.p5 a{
+  position: relative;
+  width: 622px;
+  height: 5px;
+  padding: 0;
+ 
+  margin: auto 5px;
+  background-color: #D9D9D9
+}
+
+.p5 .is-active{
+  position: relative;
+  background-color: #33a0ff;
+}
+
+
+
+/* SIGN UP */
+.login_frame .sign_input_frame {
+  position: relative;
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.sign_input_frame .sign_up_frame {
+  position: relative;
+  margin-top: 15px;
+  width: 49%;
+  height: auto;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.sign_up_frame label {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 18px;
+}
+
+.sign_up_frame input {
+  position: relative;
+  margin-top: 10px;
+  padding-left: 20px;
+  width: 100%;
+  height: 55px;
+  background: #D8FCFE;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+}
+
+
+
+.media-frame {
+  position: relative;
+  margin-top: 40px;
+  width: 100%;
+  height: 250px;
+
+  display: flex;
+  flex: row;
+  justify-content: space-between;
+}
+
+.media-frame .upload_img_frame {
+  position: relative;
+  width: 275px;
+  height: 93%;
+  display: flex;
+  border-radius: 15px;
+}
+
+.media-frame .upload_container {
+  position: relative;
+  margin-left: 30px;
+  width: 75%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.media_text {
+  font-family: "GT Walsheim Pro";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 18px;
+  color: #140342;
+}
+
+.filebox {
+  margin-top: 25px;
+  display: flex;
+}
+
+.filebox input[type="file"] {
+  position: relative;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.filebox label {
+  width: 137px;
+  height: 55px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #6a7a99;
+  border-radius: 0px 8px 8px 0px;
+
+  font-family: "GT Walsheim Pro";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 26px;
+  color: #ffffff;
+}
+
+.filebox .upload-name {
+  position: relative;
+  padding: 20px;
+  width: 85%;
+  height: 55px;
+
+  display: flex;
+  background: #dddddd;
+
+  border: 1px solid #dddddd;
+  border-radius: 8px 0px 0px 8px;
+}
+
+.thumbnail_desc {
+  margin-top: 25px;
+  font-family: "GT Walsheim Pro";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 26px;
+  color: #9c1717;
+}
