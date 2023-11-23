@@ -3,8 +3,12 @@ const {
   member_type_enums,
   member_status_enums,
   mb_profession_enums,
+  mb_gender_enums,
   ordinary_enums,
 } = require("../lib/config");
+
+// const mb_profession_values = Object.values(mb_profession_enums);
+
 
 const memberSchema = new mongoose.Schema(
   {
@@ -22,7 +26,6 @@ const memberSchema = new mongoose.Schema(
     mb_last_name: {
       type: String,
       required: true,
-      
     },
 
     mb_email: {
@@ -63,7 +66,26 @@ const memberSchema = new mongoose.Schema(
         message: "{VALUE} is not among permitted values",
       },
     },
+
+    mb_gender: {
+      type: String,
+      required: false,
+      enum: {
+        values: mb_gender_enums,
+        message: "{VALUE} is not among permitted values",
+      },
+    },
     mb_address: {
+      type: String,
+      required: false,
+    },
+
+    mb_experience: {
+      type: String,
+      required: false,
+    },
+
+    mb_degree: {
       type: String,
       required: false,
     },
@@ -95,6 +117,12 @@ const memberSchema = new mongoose.Schema(
       default: 0,
     },
     mb_likes: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+
+    mb_price: {
       type: Number,
       required: false,
       default: 0,

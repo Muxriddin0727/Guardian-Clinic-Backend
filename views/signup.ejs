@@ -78,9 +78,9 @@
         <div class="sign_up_frame">
           <label for="expr"> Experience</label>
           <textarea
-            id="expr"
-            name="expr"
-            class="mb_expr"
+            id="mb_experience"
+            name="mb_experience"
+            class="mb_experience"
             placeholder="List your previous experiences"
           ></textarea>
         </div>
@@ -89,8 +89,8 @@
           <label for="expr"> Degree</label>
           <textarea
             type="text"
-            id="degree"
-            name="degree"
+            id="mb_degree"
+            name="mb_degree"
             class="mb_degree"
             placeholder="List your dagrees"
           ></textarea>
@@ -110,10 +110,11 @@
 
         <div class="sign_up_frame">
           <label for="gender"> Select your gender</label>
-          <select id="gender" name="gender" class="mb_gender">
+          <select id="mb_gender" name="mb_gender" class="mb_gender">
             <option value="none" selected>Gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+            <% genders.forEach(function(gender) { %>
+              <option value="<%= gender %>"><%= gender %></option>
+            <% }); %>
           </select>
         </div>
       </div>
