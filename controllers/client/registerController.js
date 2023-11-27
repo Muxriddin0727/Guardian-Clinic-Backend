@@ -40,7 +40,7 @@ registerController.login = async (req, res) => {
       httpOnly: false,
     });
 
-    res.json({ state: "success", data: result });
+    res.json({ state: "success", data: result, token: token });
   } catch (err) {
     console.log(`ERROR, client/login,  ${err.message}`);
     res.json({ state: "fail", message: err.message });

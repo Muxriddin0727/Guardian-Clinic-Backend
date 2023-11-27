@@ -5,6 +5,7 @@ const slotSchema = new mongoose.Schema(
     {
         'slot_time' : String,
         'slot_date' : String,
+        
     
       },
       { timestamps: true }

@@ -7,6 +7,7 @@ const appointmentSchema = new mongoose.Schema(
         'name' : String,
         'email' : String,
         'slots' : {type: mongoose.Schema.Types.ObjectId, ref: 'slot'},
+        
     
       },
       { timestamps: true }

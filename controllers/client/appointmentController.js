@@ -39,3 +39,27 @@ appointmentController.createAppointment = async (req, res) => {
     res.json({ state: "fail", message: err.message });
   }
 }
+
+appointmentController.updateAppointment = async (req, res) => {
+  try {
+    console.log("POST: client/updateAppointment");
+    const appointment = new Appointment();
+    const result = await appointment.updateAppointmentData(req.params.id, req.body);
+    res.json({ state: "success", data: result });
+  } catch (err) {
+    console.log(`ERROR, client/updateAppointment, ${err.message}`);
+    res.json({ state: "fail", message: err.message });
+  }
+}
+
+appointmentController.removeAppointment = async (req, res) => {
+  try {
+    console.log("POST: client/removeAppointment");
+    const appointment = new Appointment();
+    const result = await appointment.removeAppointmentData(req.params.id);
+    res.json({ state: "success", data: result });
+  } catch (err) {
+    console.log(`ERROR, client/removeAppointment, ${err.message}`);
+    res.json({ state: "fail", message: err.message });
+  }
+}

@@ -28,8 +28,7 @@ router_client.get(
   "/category",
   memberController.retrieveAtuhMember,
   categoryController.get_categories
-);  
-
+);
 
 router_client.get(
   "/category/:route_path",
@@ -40,8 +39,14 @@ router_client.get(
 router_client.get(
   "/category/:route_path/:id",
   memberController.retrieveAtuhMember,
-  doctorController.getDoctorById
+  doctorController.get_by_category_id
 );
+
+// router_client.get(
+//   "/category/:id",
+//   memberController.retrieveAtuhMember,
+//   doctorController.get_by_category_id
+// );
 
 router_client.post(
   "/member-liken",
@@ -50,9 +55,7 @@ router_client.post(
 );
 
 //Blogs//
-router_client.get("/blogs", 
-blogController.getAllBlogs
-);
+router_client.get("/blogs", blogController.getAllBlogs);
 
 router_client.get(
   "/blogs/:id/with-author",
@@ -79,6 +82,47 @@ router_client.post(
   appointmentController.createAppointment
 );
 
+router_client.post(
+  "/update-appointment/:id",
+  memberController.retrieveAtuhMember,
+  appointmentController.updateAppointment
+);
 
+router_client.post(
+  "/remove-appointment/:id",
+  memberController.retrieveAtuhMember,
+  appointmentController.removeAppointment
+);
+
+//Slots//
+router_client.get(
+  "/slots",
+  memberController.retrieveAtuhMember,
+  slotController.getAllSlots
+);
+
+router_client.get(
+  "/slots/:id",
+  memberController.retrieveAtuhMember,
+  slotController.getChosenSlot
+);
+
+router_client.post(
+  "/create-slot",
+  memberController.retrieveAtuhMember,
+  slotController.createSlot
+);
+
+router_client.post(
+  "/update-slot/:id",
+  memberController.retrieveAtuhMember,
+  slotController.updateSlot
+);
+
+router_client.post(
+  "/remove-slot/:id",
+  memberController.retrieveAtuhMember,
+  slotController.removeSlot
+);
 
 module.exports = router_client;
