@@ -17,11 +17,10 @@ blogController.addNewBlog = async (req, res) => {
 
     const result = await blog.addNewBlogData(data, req.member);
 
-    const html = `<script>
-          alert('new product has benn added successfully');
-          window.location.replace("/secured/doctor/dashboard");
-        </script>`;
-    res.end(html);
+    res.json({
+      state: "success",
+      message: "New product has been added successfully",
+    });
   } catch (err) {
     console.log(`ERROR: cont/addNewBlog, ${err.message}`);
   }

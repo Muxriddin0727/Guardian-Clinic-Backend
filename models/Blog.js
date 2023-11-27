@@ -1,11 +1,97 @@
 const BlogModel = require("../schema/blog.model");
+const Member = require("./Member");
 const assert = require("assert");
-const { shapeIntoMongooseObjectId } = require("../lib/config");
+const {
+  shapeIntoMongooseObjectId,
+  lookup_auth_member_liked,
+} = require("../lib/config");
 const Definer = require("../lib/mistake");
+const memberModel = require("../schema/member.model");
 
 class Blog {
   constructor() {
     this.blogModel = BlogModel;
+  }
+
+  async getAllBlogsData(member, data) {
+    try {
+      const auth_mb_id = shapeIntoMongooseObjectId(member?._id);
+
+      let match = { blog_status: "PROCESS" };
+
+      const sort = { blog_likes: -1 };
+      const page = Number.isInteger(data.page) ? data.page : 1;
+      const limit = Number.isInteger(data.limit) ? data.limit : 12;
+
+      const result = await this.blogModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        {
+          $lookup: {
+            from: "members", 
+            localField: "doctor_mb_id",
+            foreignField: "_id",
+            as: "member_data"
+          }
+        },
+        { $unwind: "$member_data" },
+        lookup_auth_member_liked(auth_mb_id),
+      ])
+      .exec();
+      
+
+      assert.ok(result, Definer.general_err1);
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async getChosenBlogsData(member, id) {
+    try {
+      const auth_mb_id = member ? shapeIntoMongooseObjectId(member?._id) : null;
+      id = shapeIntoMongooseObjectId(id);
+  
+      if (member) {
+        const member_obj = new Member();
+        await member_obj.viewChosenItemByMember(member, id, "blog");
+      }
+      console.log("member:", member);
+    
+      const result = await this.blogModel
+        .aggregate([
+          { $match: { _id: id, blog_status: "PROCESS" } },
+          lookup_auth_member_liked(auth_mb_id),
+          {
+            $lookup: {
+              from: "members",
+              localField: "doctor_mb_id", 
+              foreignField: "_id", 
+              as: "author", 
+            },
+          },
+          {
+            $unwind: "$author", // Flatten the author data
+          },
+        ])
+        .exec();
+        console.log("result:", result);
+        console.log("_id:", id);
+        console.log("auth_mb_id:", auth_mb_id);
+        console.log("member:", member);
+  
+      assert.ok(result, Definer.general_err1);
+      if (result.length > 0) {
+        return result[0];
+      } else {
+        throw new Error(`No blog found with id: ${id}`);
+      }
+    } catch (err) {
+      throw err;
+    }
   }
 
   async addNewBlogData(data, member) {
@@ -67,6 +153,8 @@ class Blog {
       throw err;
     }
   }
+
+
 }
 
 module.exports = Blog;

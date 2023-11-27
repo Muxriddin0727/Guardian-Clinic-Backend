@@ -1,5 +1,5 @@
 const Blog = require("../../models/Blog");
-const { mb_profession_enums } = require("../../lib/config");
+const { mb_profession_enums, mb_gender_enums } = require("../../lib/config");
 
 let doctorController = module.exports;
 
@@ -30,7 +30,7 @@ doctorController.getDoctorBlogs = async (req, res) => {
 doctorController.getSignupDoctor = async (req, res) => {
   try {
     console.log("GET: cont/getSignupDoctor");
-    res.render("signup", { professions: mb_profession_enums });
+    res.render("signup", { professions: mb_profession_enums, genders: mb_gender_enums });
   } catch (err) {
     console.log(`ERROR, secured/getSignupDoctor, ${err.message}`);
     res.json({ state: "fail", message: err.message });

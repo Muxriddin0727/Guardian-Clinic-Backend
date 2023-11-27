@@ -47,7 +47,7 @@
 
 
                     <td>
-                      <select class="spec_select new_product_status" id="<%= value._id %>">
+                      <select class="spec_select new_blog_status" id="<%= value._id %>">
                         <option value="PAUSED" <%= value.blog_status==="PAUSED" ? 'selected' : '' %> >Paused</option>
                         <option value="PROCESS" <%= value.blog_status==="PROCESS" ? 'selected' : '' %> >Active</option>
                       </select>
@@ -132,7 +132,7 @@
           try {
             const response = await axios.post(
               `/secured/blogs/edit/${id}`,
-              { id: id, blog_status: blog_status, mb_profession: e.target.mb_profession });
+              { blog_status: blog_status,});
 
             if (response.headers['content-type'] !== 'application/json') {
               console.error('Expected JSON but received', response.headers['content-type']);
@@ -163,6 +163,7 @@
           }
          
           const blog_title = $(".blog_title").val();
+          const blog_description = $(".blog_description").val();
           const blog_content = $(".blog_content").val();
           const blog_status = $(".blog_status").val();
 
@@ -170,16 +171,17 @@
             const response = await axios.post('/secured/blogs/create', {
              
               blog_title: blog_title,
+              blog_description: blog_description,
               blog_content: blog_content,
               blog_status: blog_status,
-              mb_profession: event.target.mb_profession
+             
             });
             const result = response.data;
             console.log("result:", result);
 
             if (result.state == "success") {
               alert("success");
-              location.reload();
+              window.location.href = "/secured/doctor/dashboard";
             } else {
               alert(result.message);
             }
@@ -193,10 +195,11 @@
       function validateForm() {
        
         const blog_title = $(".blog_title").val();
+        const blog_description = $(".blog_description").val();
         const blog_content = $(".blog_content").val();
         const blog_status = $(".blog_status").val();
 
-        if (blog_title == '' || blog_content == '' || blog_status == '') {
+        if (blog_title == '' || blog_description == '' || blog_content == '' || blog_status == '') {
           alert(`Iltimos hamma ma'lumotlarni kiriting!`);
           return false;
         } else return true; 
