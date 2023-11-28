@@ -33,14 +33,14 @@ const blogSchema = new mongoose.Schema(
     },
  
     blog_likes: {
-      type: Number,
+      type: Array,
       required: false,
-      default: 0,
+      default: [].length,
     },
     blog_views: {
-      type: Number,
+      type: Array,
       required: false,
-      default: 0,
+      default: [].length,
     },
     doctor_mb_id: {
       type: Schema.Types.ObjectId,

@@ -20,7 +20,6 @@ router_client.get(
 );
 router_client.get(
   "/top-doctors",
-  memberController.retrieveAtuhMember,
   doctorController.getTopDoctors
 );
 
@@ -61,6 +60,18 @@ router_client.get(
   "/blogs/:id/with-author",
   memberController.retrieveAtuhMember,
   blogController.getChosenBlog
+);
+
+router_client.post(
+  "/blog-liken",
+  memberController.retrieveAtuhMember,
+  blogController.likeBlogChosen
+);
+
+router_client.get(
+  "/blogs/:id",
+  memberController.retrieveAtuhMember,
+  blogController.viewBlogChosen
 );
 
 //Appointments//
