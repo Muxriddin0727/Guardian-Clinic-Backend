@@ -1,4 +1,5 @@
 const Blog = require("../../models/Blog");
+const blogModel = require("../../schema/blog.model");
 
 let blogController = module.exports;
 
@@ -36,5 +37,49 @@ blogController.getBlogWithOwner = async (req, res) => {
   } catch (err) {
     console.log(`ERROR, cont/getBlogWithOwner, ${err.message}`);
     res.json({ state: 'fail', message: err.message });
+  }
+};
+
+blogController.likeBlogChosen = async (req, res) => {
+  try {
+    const {blog_id, _id} = req.body; 
+    console.log("POST: client/likeBlogChosen");
+
+    const found_blog = await blogModel.findById(blog_id);
+    if (found_blog.blog_likes.includes(_id)) {
+      found_blog.blog_likes =  found_blog.blog_likes.filter((id) => id !== _id);
+    } else {
+      found_blog.blog_likes = [...found_blog.blog_likes, _id];
+    }
+
+    await blogModel.findByIdAndUpdate(found_blog._id, {
+      ...found_blog._doc,
+    });
+
+    res.json({ state: "success", });
+  } catch (err) {
+    console.log(`ERROR, client/likeBlogChosen, ${err.message}`);
+    res.json({ state: "fail", message: err.message });
+  }
+};
+
+blogController.viewBlogChosen = async (req, res) => {
+  try {
+    const {blog_id, _id} = req.body; 
+    console.log("POST: client/viewBlogChosen");
+
+    const found_blog = await blogModel.findById(blog_id);
+    if (!found_blog.blog_views.includes(_id)) {
+      found_blog.blog_views = [...found_blog.blog_views, _id];
+    }
+
+    await blogModel.findByIdAndUpdate(found_blog._id, {
+      ...found_blog._doc,
+    });
+
+    res.json({ state: "success", });
+  } catch (err) {
+    console.log(`ERROR, client/viewBlogChosen, ${err.message}`);
+    res.json({ state: "fail", message: err.message });
   }
 };

@@ -112,14 +112,14 @@ const memberSchema = new mongoose.Schema(
       },
     },
     mb_views: {
-      type: Number,
+      type: Array,
       required: false,
-      default: 0,
+      default: [].length,
     },
     mb_likes: {
-      type: Number,
+      type: Array,
       required: false,
-      default: 0,
+      default: [].length,
     },
 
     mb_price: {
