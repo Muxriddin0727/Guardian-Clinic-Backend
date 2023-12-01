@@ -82,13 +82,13 @@ router_client.get(
 );
 
 router_client.get(
-  "/appointments/:id",
+  "/appointments/:ref_id",
   memberController.retrieveAtuhMember,
   appointmentController.getChosenAppointment
 );
 
 router_client.post(
-  "/create-appointment",
+  "/create-appointment/:ref_id",
   memberController.retrieveAtuhMember,
   appointmentController.createAppointment
 );

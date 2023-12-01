@@ -1,94 +1,53 @@
+const { shapeIntoMongooseObjectId } = require("../lib/config");
 const AppointmentModel = require("../schema/appointment.model");
 const SlotModel = require("../schema/slot.model");
+const MemberModel = require("../schema/member.model");
 
 class Appointment {
   constructor() {
     this.appointmentModel = AppointmentModel;
     this.slotModel = SlotModel;
+    this.memberModel = MemberModel;
   }
 
-  async getAllAppointmentsData() {
+  async getAppointmentDetailsData(member) {
     try {
+      member._id = shapeIntoMongooseObjectId(member._id);
+      console.log("Member ID:", member._id); // Log the member ID
+  
       const appointments = await this.appointmentModel
-        .find()
-        .populate("slots")
+        .find({doctor_id:  member._id})
+        .populate("slots.ref_id") // Populate the ref_id field in the slots array
         .exec();
-      if (!appointments) {
+  
+      console.log("appointments:", appointments); // Log the appointments
+      if (appointments.length === 0) {
         throw new Error("No appointments found");
       }
-      return appointments;
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  async getChosenAppointmentData(id) {
-    try {
-      const appointment = await this.appointmentModel
-        .findOne({ _id: id })
-        .exec();
-      if (!appointment) {
-        throw new Error("No appointment found");
-      }
-      return appointment;
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  async createAppointmentData(body) {
-    try {
-      const slot = new this.slotModel({
-        slot_time: body.slot_time,
-        slot_date: body.slot_date,
-        created_at: Date.now(),
+  
+      let dashboardData = [];
+  
+      appointments.forEach(appointment => {
+        appointment.slots.forEach(slot => {
+          if (slot.ref_id) { // Check if ref_id is populated
+            console.log("Populated slot:", slot); // Log the populated slot
+            let data = {
+              patientName: slot.ref_id.mb_name,
+              patientContact: slot.ref_id.mb_email,
+              appointmentDate: appointment.date,
+              startTime: slot.start,
+              endTime: slot.end
+            };
+            dashboardData.push(data);
+          }
+        });
       });
-      await slot.save();
-
-      const appointment = new this.appointmentModel({
-        name: body.name,
-        email: body.email,
-        slots: slot._id,
-        created_at: body.created_at,
-      });
-
-      const result = await appointment.save();
-      return result;
+  
+      console.log(dashboardData);
+  
+      return dashboardData;
     } catch (err) {
-      throw err;
-    }
-  }
-
-  async updateAppointmentData(id, body) {
-    try {
-      const appointment = await this.appointmentModel
-        .findOne({ _id: id })
-        .exec();
-      if (!appointment) {
-        throw new Error("No such appointment");
-      }
-
-      appointment.name = body.name ? body.name : appointment.name;
-      appointment.email = body.email ? body.email : appointment.email;
-      appointment.slots = body.slots ? body.slots : appointment.slots;
-      appointment.created_at = body.created_at
-        ? body.created_at
-        : appointment.created_at;
-
-      const result = await appointment.save();
-      return result;
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  async removeAppointmentData(id) {
-    try {
-      const result = await this.appointmentModel.findByIdAndRemove(id).exec();
-      if (!result) {
-        throw new Error('No such appointment');
-      }
-    } catch (err) {
+      console.log("Error in getAppointmentDetailsData:", err); // Log the error
       throw err;
     }
   }

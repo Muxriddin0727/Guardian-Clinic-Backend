@@ -1,4 +1,5 @@
 const Blog = require("../../models/Blog");
+const Appointment = require("../../models/Appointment");
 const { mb_profession_enums, mb_gender_enums } = require("../../lib/config");
 
 let doctorController = module.exports;
@@ -13,14 +14,17 @@ doctorController.home = async (req, res) => {
   }
 };
 
-doctorController.getDoctorBlogs = async (req, res) => {
+doctorController.getDoctorDshboard = async (req, res) => {
   try {
     console.log("secured/getDoctorDashboard ");
 
     const blog = new Blog();
-    const data = await blog.getAllBlogsdDataSecured(res.locals.member);
+    const data = await blog.getDoctorDashboardDataSecured(res.locals.member);
 
-    res.render("doctor-card", { doctor_data: data });
+    const appointment = new Appointment();
+    const appointment_data = await appointment.getAppointmentDetailsData(res.locals.member);
+
+    res.render("doctor-card", { doctor_data: data, appointment_data: appointment_data });
   } catch (err) {
     console.log(`ERROR, secued/getDoctorDashboard , ${err.message}`);
     res.redirect("/secured");
