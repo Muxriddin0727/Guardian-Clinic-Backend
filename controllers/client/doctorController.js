@@ -24,9 +24,7 @@ doctorController.get_by_category = async ({ params, query }, res) => {
       .find({ mb_profession: profession })
       .lean()
       .exec();
-    console.log("doctors::::::", doctors);
-    console.log("profession::::::", profession);
-    console.log("route_path::::::", route_path);
+    
 
     const type_check = () => {
       switch (type) {
@@ -51,7 +49,7 @@ doctorController.get_by_category = async ({ params, query }, res) => {
           return 0;
       }
     };
-    console.log("before sorting::::::", doctors);
+    // console.log("before sorting::::::", doctors);
     if (!doctors)
       return res.status(400).json({
         message: "Category not found",

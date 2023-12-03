@@ -77,7 +77,7 @@ class Doctor {
     }
   }
 
-  async getAllDoctorsData() {
+  async getAllDoctorsDataSecured() {
     try {
       let result = await this.memberModel
         .find({
@@ -91,7 +91,7 @@ class Doctor {
     }
   }
 
-  async updateDoctorByAdminData(update_date) {
+  async updateDoctorsByAdminDataSecured(update_date) {
     try {
       const id = shapeIntoMongooseObjectId(update_date?.id);
       const result = await this.memberModel

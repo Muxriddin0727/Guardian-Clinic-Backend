@@ -5,6 +5,7 @@ const registerController = require("./controllers/secured/registerController");
 const appointmentController = require("./controllers/secured/appointmentController");
 const blogController = require("./controllers/secured/blogControler");
 const uploader_members = require("./utils/upload-multer")("members");
+const memberController = require ("./controllers/secured/member.Controller")
 
 router_secured.get("/", doctorController.home);
 //Register//
@@ -36,6 +37,18 @@ router_secured.post(
   "/blogs/edit/:id",
   doctorController.validateDoctor,
   blogController.updateChosenBlog
+);
+
+router_secured.get(
+  "/all-doctors",
+  memberController.validateAdmin,
+  memberController.getAllDoctors
+);
+
+router_secured.post (
+  "/all-doctors/edit",
+  memberController.validateAdmin,
+  memberController.updateDoctorsByAdmin
 );
 
 module.exports = router_secured;

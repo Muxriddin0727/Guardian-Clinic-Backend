@@ -72,6 +72,28 @@ memberController.likeMemberChosen = async (req, res) => {
   }
 };
 
+memberController.commentOnMember = async (req, res) => {
+  try {
+    const {mb_id, _id, comment} = req.body; 
+    console.log("POST: client/commentOnMember");
+
+    const found_member = await memberModel.findById(mb_id);
+    if (!found_member.mb_comments) {
+      found_member.mb_comments = [];
+    }
+    found_member.mb_comments.push({userId: _id, text: comment});
+
+    await memberModel.findByIdAndUpdate(found_member._id, {
+      ...found_member._doc,
+    });
+
+    res.json({ state: "success", found_member });
+  } catch (err) {
+    console.log(`ERROR, client/commentOnMember, ${err.message}`);
+    res.json({ state: "fail", message: err.message });
+  }
+};
+
 memberController.updateMember = async (req, res) => {
   try {
     console.log("POST: client/updateMember");

@@ -53,6 +53,12 @@ router_client.post(
   memberController.likeMemberChosen
 );
 
+router_client.post(
+  "/member-comment",
+  memberController.retrieveAtuhMember,
+  memberController.commentOnMember
+);
+
 //Blogs//
 router_client.get("/blogs", blogController.getAllBlogs);
 

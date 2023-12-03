@@ -122,6 +122,27 @@ const memberSchema = new mongoose.Schema(
       default: [].length,
     },
 
+    mb_comments: {
+      type: [
+        {
+          userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+          },
+          text: {
+            type: String,
+            required: true
+          },
+          timestamp: {
+            type: Date,
+            default: Date.now
+          }
+        }
+      ],
+      default: []
+    },
+
     mb_price: {
       type: Number,
       required: false,
