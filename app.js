@@ -1,3 +1,4 @@
+console.log("Bismillahirrohmanirrohim");
 const http = require("http");
 const express = require("express");
 const app = express();
@@ -5,7 +6,6 @@ const morgan = require("morgan");
 const router_client = require("./router_client");
 const router_secured = require("./router_secured");
 
- 
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
@@ -52,13 +52,40 @@ app.use(function (req, res, next) {
 app.set("views", "views");
 app.set("view engine", "ejs");
 
-
 // 4: Routing code
-app.use("/client", router_client); 
+app.use("/client", router_client);
 app.use("/secured", router_secured);
 
 const server = http.createServer(app);
+/** SOCKET.IO BACKEND SERVER **/
+const io = require("socket.io")(server, {
+  serveClient: false,
+  origins: "*:*",
+  transport: ["websocket", "xhr-polling"],
+});
 
+let online_users = 0;
+io.on("connection", function (socket) {
+  online_users++;
+  console.log("New user, total:", online_users);
+  socket.emit("greetMsg", { text: "Welcome" });
+  io.emit("infoMsg", { total: online_users });
+
+  socket.on("disconnect", function () {
+    online_users--;
+    socket.broadcast.emit("infoMsg", { total: online_users });
+    console.log("client disconnect, total: ", online_users);
+  });
+
+  socket.on("createMsg", function (data) {
+    console.log("createMsg:", data);
+    io.emit("newMsg", data);
+  });
+});
+//socket.emit -- ulanag odam uchun yoziladigan xabar/ bu faqat osha odamga boradi
+//socket.broadcast.emit -- ulangan odamdan tashqari userlarga malumot jonatadi
+//io.emit -- hammag malumot joanatadi
+
+/** SOCKET.IO BACKEND SERVER **/
 
 module.exports = server;
-

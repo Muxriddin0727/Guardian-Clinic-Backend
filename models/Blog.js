@@ -78,10 +78,10 @@ class Blog {
           },
         ])
         .exec();
-        console.log("result:", result);
-        console.log("_id:", id);
-        console.log("auth_mb_id:", auth_mb_id);
-        console.log("member:", member);
+        // console.log("result:", result);
+        // console.log("_id:", id);
+        // console.log("auth_mb_id:", auth_mb_id);
+        // console.log("member:", member);
   
       assert.ok(result, Definer.general_err1);
       if (result.length > 0) {
@@ -137,7 +137,7 @@ class Blog {
     }
   }
 
-  async getAllBlogsdDataSecured(member) {
+  async getDoctorDashboardDataSecured(member) {
     try {
       console.log("member:", member);
       member._id = shapeIntoMongooseObjectId(member._id);
@@ -145,7 +145,7 @@ class Blog {
         doctor_mb_id: member._id,
       });
 
-      console.log("result:", result);
+      // console.log("result:", result);
       assert.ok(result, Definer.general_err1);
       return result;
     } catch (err) {

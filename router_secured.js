@@ -2,8 +2,10 @@ const express = require("express");
 const router_secured = express.Router();
 const doctorController = require("./controllers/secured/doctorController");
 const registerController = require("./controllers/secured/registerController");
+const appointmentController = require("./controllers/secured/appointmentController");
 const blogController = require("./controllers/secured/blogControler");
 const uploader_members = require("./utils/upload-multer")("members");
+const memberController = require ("./controllers/secured/member.Controller")
 
 router_secured.get("/", doctorController.home);
 //Register//
@@ -23,16 +25,30 @@ router_secured.get("/logout", registerController.logout);
 router_secured.get("/check-me", doctorController.checkSessions);
 
 //Others//
-router_secured.get("/doctor/dashboard", doctorController.getDoctorBlogs);
-router_secured.post("/blogs/create", 
-doctorController.validateDoctor,
-blogController.addNewBlog
-
+router_secured.get("/doctor/dashboard", 
+doctorController.getDoctorDshboard,
 );
-router_secured.post("/blogs/edit/:id",
- doctorController.validateDoctor,
- blogController.updateChosenBlog
+router_secured.post(
+  "/blogs/create",
+  doctorController.validateDoctor,
+  blogController.addNewBlog
+);
+router_secured.post(
+  "/blogs/edit/:id",
+  doctorController.validateDoctor,
+  blogController.updateChosenBlog
 );
 
+router_secured.get(
+  "/all-doctors",
+  memberController.validateAdmin,
+  memberController.getAllDoctors
+);
+
+router_secured.post (
+  "/all-doctors/edit",
+  memberController.validateAdmin,
+  memberController.updateDoctorsByAdmin
+);
 
 module.exports = router_secured;

@@ -36,7 +36,7 @@ registerController.login = async (req, res) => {
       req.session.member = result;
       req.session.save(function () {
         result.mb_type === "ADMIN"
-          ? res.redirect("/secured/all-doctor")
+          ? res.redirect("/secured/all-doctors")
           : res.redirect("/secured/doctor/dashboard");
       });
     } catch (err) {

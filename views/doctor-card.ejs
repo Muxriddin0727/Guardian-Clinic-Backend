@@ -1,210 +1,239 @@
 <div class="dishs_table">
   <%- include('includes/header') %>
-  <link rel="stylesheet" type="text/css" href="/css/menu.css" />
+    <link rel="stylesheet" type="text/css" href="/css/menu.css" />
 
-  <body>
-    <div id="main_container">
-      <!-- group_name div start -->
-      <div class="group_name">
-        <ul class="nav justify-content-center">
-          <li class="nav-item" style="cursor: pointer">
-            <a class="nav-link active" href="/secured">Home</a>
-          </li>
+    <body>
+      <div id="main_container">
+        <!-- group_name div start -->
+        <div class="group_name">
+          <ul class="nav justify-content-center">
+            <li class="nav-item" style="cursor: pointer">
+              <a class="nav-link active" href="/secured">Home</a>
+            </li>
 
-          <li class="nav-item" style="cursor: pointer">
-            <a class="nav-link" href="/secured/doctor/dashboard">MyResto</a>
-          </li>
-          <li class="nav-item" style="cursor: pointer">
-            <a class="nav-link" href="/secured/logout">Logout</a>
-          </li>
-        </ul>
-      </div>
-      <!-- restaurant_menu_frame div start -->
-      <div class="restaurant_menu_frame">
-        <div class="restaurant_container">
+            <li class="nav-item" style="cursor: pointer">
+              <a class="nav-link" href="/secured/doctor/dashboard">My Dashboard</a>
+            </li>
+            <li class="nav-item" style="cursor: pointer">
+              <a class="nav-link" href="/secured/logout">Logout</a>
+            </li>
+          </ul>
+        </div>
+        <!-- restaurant_menu_frame div start -->
+        <div class="restaurant_menu_frame">
+          <div class="restaurant_container">
 
-          <div class="dishs_table">
-            <span class="new_dish_txt">
-              <%= member.mb_username.replace(/\b\w/g, function(l){ return l.toUpperCase() }) %> Personal Dashboard
-            </span>
-            <table class="table table-bordered table-hover">
-              <thead class="thead-light">
-                <th scope="col">T/r</th>
-                <th scope="col">Blog Title</th>
-                <th scope="col">Blog Status</th>
+            <div class="dishs_table">
+              <span class="new_dish_txt">
+                Dr.<%= member.mb_name.replace(/\b\w/g, function(l){ return l.toUpperCase() }) %>'s Patient Appointment
+                  Dashboard
+              </span>
+              <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                  <th scope="col">T/r</th>
+                  <th scope="col">Patient Name</th>
+                  <th scope="col">Appointment Date and Time</th>
+                  <th scope="col">Patient Email</th>
+                </thead>
+                <tbody id="appointmentTableBody" style="background-color: white">
+                  <% appointment_data.forEach((appointment, index) => { %>
+                    <tr>
+                      <td><%= index + 1 %></td>
+                      <td><%= appointment.patientName %></td>
+                      <td><%= appointment.appointmentDate %>,   <%= appointment.startTime %> - <%= appointment.endTime %></td>
+                      <td><%= appointment.patientContact %></td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
 
-              </thead>
-              <% doctor_data.map((value, key) => { %>
-              <tbody style="background-color: white">
-               
-                  <tr>
-                    <td>
-                      <%=key + 1 %>
-                    </td>
-                    <td>
-                      <%=value.blog_title %>
-                    </td>
 
 
-                    <td>
-                      <select class="spec_select new_blog_status" id="<%= value._id %>">
-                        <option value="PAUSED" <%= value.blog_status==="PAUSED" ? 'selected' : '' %> >Paused</option>
-                        <option value="PROCESS" <%= value.blog_status==="PROCESS" ? 'selected' : '' %> >Active</option>
-                      </select>
-                    </td>
-                  </tr>
-              </tbody>
-              <%}) %>
-            </table>
-
-            <div class="long_input" style="align-items: flex-end; margin-bottom: 25px;">
-              <button class="btn btn-primary hiding_btn" onclick="hideDishContainer()"> Add Blog</button>
             </div>
 
-          </div>
+            <div class="dishs_table">
+              <span class="new_dish_txt">
+                Dr. <%= member.mb_name.replace(/\b\w/g, function(l){ return l.toUpperCase() }) %>'s Blogs Dashboard
+              </span>
+              <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                  <th scope="col">T/r</th>
+                  <th scope="col">Blog Title</th>
+                  <th scope="col">Blog Status</th>
 
-          <form onsubmit="return validateForm()" action="/secured/blogs/create" method="POST" class="dish_container"
-            enctype="multipart/form-data">
-            <div class="long_input" style="display: flex;  align-items: center;">
-              <span class="new_dish_txt">New Blog</span>
-            </div>
+                </thead>
+                <% doctor_data.map((value, key)=> { %>
+                  <tbody style="background-color: white">
 
-            <div>
-              <div class="long_input">
-                <label>Blog Subject</label>
-                <input type="text"  name="blog_title" class="blog_title">
+                    <tr>
+                      <td>
+                        <%=key + 1 %>
+                      </td>
+                      <td>
+                        <%=value.blog_title %>
+                      </td>
+
+
+                      <td>
+                        <select class="spec_select new_blog_status" id="<%= value._id %>">
+                          <option value="PAUSED" <%=value.blog_status==="PAUSED" ? 'selected' : '' %> >Paused</option>
+                          <option value="PROCESS" <%=value.blog_status==="PROCESS" ? 'selected' : '' %> >Active</option>
+                        </select>
+                      </td>
+                    </tr>
+                  </tbody>
+                  <%}) %>
+              </table>
+
+              <div class="long_input" style="align-items: flex-end; margin-bottom: 25px;">
+                <button class="btn btn-primary hiding_btn" onclick="hideDishContainer()"> Add Blog</button>
               </div>
-              <input type="text" name="blog_status" value="PAUSED" class="product_status" hidden>
+
             </div>
 
-            <div class="long_input">
-              <label>Short Description</label>
-              <input type="text"  name="blog_description" class="blog_description">
-            </div>
+            <form onsubmit="return validateForm()" action="/secured/blogs/create" method="POST" class="dish_container"
+              enctype="multipart/form-data">
+              <div class="long_input" style="display: flex;  align-items: center;">
+                <span class="new_dish_txt">New Blog</span>
+              </div>
 
-         
-          
+              <div>
+                <div class="long_input">
+                  <label>Blog Subject</label>
+                  <input type="text" name="blog_title" class="blog_title">
+                </div>
+                <input type="text" name="blog_status" value="PAUSED" class="product_status" hidden>
+              </div>
 
-            <div class="long_input">
-              <label> Blog Content </label>
-              <textarea name="blog_content" class="blog_content"></textarea>
-            </div>
+              <div class="long_input">
+                <label>Short Description</label>
+                <input type="text" name="blog_description" class="blog_description">
+              </div>
 
 
 
-            <div class="long_input" style="align-items: flex-end; margin-bottom: 25px;">
-              <button type="submit" class="btn btn-primary showing_btn" onclick="showDishContainer()"
-                id="submit_btn">Submit</button>
-            </div>
 
-          </form>
+              <div class="long_input">
+                <label> Blog Content </label>
+                <textarea name="blog_content" class="blog_content"></textarea>
+              </div>
+
+
+
+              <div class="long_input" style="align-items: flex-end; margin-bottom: 25px;">
+                <button type="submit" class="btn btn-primary showing_btn" onclick="showDishContainer()"
+                  id="submit_btn">Submit</button>
+              </div>
+
+            </form>
+          </div>
         </div>
       </div>
-    </div>
 
-    <script>
+      <script>
 
-      function hideDishContainer() {
-        try {
-          document.querySelector('.dish_container').style.display = 'block';
-          console.log("Success");
-        } catch (error) {
-          console.log("Error:", error);
-        }
-      }
-
-      function showDishContainer() {
-        try {
-          document.querySelector('.dish_container').style.display = 'none';
-          console.log("Success");
-        } catch (error) {
-          console.log("Error:", error);
-        }
-      }
-
-      $(function () {
-
-        $(".new_blog_status").on("change", async function (e) {
-          console.log(e.target);
-          const id = e.target.id;
-          const blog_status = $(`#${id}.new_blog_status`).val();
-
+        function hideDishContainer() {
           try {
-            const response = await axios.post(
-              `/secured/blogs/edit/${id}`,
-              { blog_status: blog_status,});
+            document.querySelector('.dish_container').style.display = 'block';
+            console.log("Success");
+          } catch (error) {
+            console.log("Error:", error);
+          }
+        }
 
-            if (response.headers['content-type'] !== 'application/json') {
-              console.error('Expected JSON but received', response.headers['content-type']);
+        function showDishContainer() {
+          try {
+            document.querySelector('.dish_container').style.display = 'none';
+            console.log("Success");
+          } catch (error) {
+            console.log("Error:", error);
+          }
+        }
+
+
+        $(function () {
+
+          $(".new_blog_status").on("change", async function (e) {
+            console.log(e.target);
+            const id = e.target.id;
+            const blog_status = $(`#${id}.new_blog_status`).val();
+
+            try {
+              const response = await axios.post(
+                `/secured/blogs/edit/${id}`,
+                { blog_status: blog_status, });
+
+              if (response.headers['content-type'] !== 'application/json') {
+                console.error('Expected JSON but received', response.headers['content-type']);
+                return;
+              }
+
+
+              const result = response.data;
+              console.log("response:", reponse);
+
+              if (result.state == "success") {
+                alert("success");
+                location.reload();
+              } else {
+                alert(`Error: ${response.status} ${response.statusText}\n${result ? result.message : ''}`);
+              }
+
+            } catch (err) {
+              console.log('updateChosenProduct err:', err);
+            }
+          });
+
+          document.querySelector('#submit_btn').addEventListener('click', async function (event) {
+            event.preventDefault();
+
+            if (!validateForm()) {
               return;
             }
 
+            const blog_title = $(".blog_title").val();
+            const blog_description = $(".blog_description").val();
+            const blog_content = $(".blog_content").val();
+            const blog_status = $(".blog_status").val();
 
-            const result = response.data;
-            console.log("response:", reponse);
+            try {
+              const response = await axios.post('/secured/blogs/create', {
 
-            if (result.state == "success") {
-              alert("success");
-              location.reload();
-            } else {
-              alert(`Error: ${response.status} ${response.statusText}\n${result ? result.message : ''}`);
+                blog_title: blog_title,
+                blog_description: blog_description,
+                blog_content: blog_content,
+                blog_status: blog_status,
+
+              });
+              const result = response.data;
+              console.log("result:", result);
+
+              if (result.state == "success") {
+                alert("success");
+                window.location.href = "/secured/doctor/dashboard";
+              } else {
+                alert(result.message);
+              }
+
+            } catch (err) {
+              console.log('createBlog err:', err);
             }
-
-          } catch (err) {
-            console.log('updateChosenProduct err:', err);
-          }
+          });
         });
 
-        document.querySelector('#submit_btn').addEventListener('click', async function (event) {
-          event.preventDefault();
+        function validateForm() {
 
-          if (!validateForm()) {
-            return;
-          }
-         
           const blog_title = $(".blog_title").val();
           const blog_description = $(".blog_description").val();
           const blog_content = $(".blog_content").val();
           const blog_status = $(".blog_status").val();
 
-          try {
-            const response = await axios.post('/secured/blogs/create', {
-             
-              blog_title: blog_title,
-              blog_description: blog_description,
-              blog_content: blog_content,
-              blog_status: blog_status,
-             
-            });
-            const result = response.data;
-            console.log("result:", result);
+          if (blog_title == '' || blog_description == '' || blog_content == '' || blog_status == '') {
+            alert(`Iltimos hamma ma'lumotlarni kiriting!`);
+            return false;
+          } else return true;
+        }
+      </script>
+    </body>
 
-            if (result.state == "success") {
-              alert("success");
-              window.location.href = "/secured/doctor/dashboard";
-            } else {
-              alert(result.message);
-            }
-
-          } catch (err) {
-            console.log('createBlog err:', err);
-          }
-        });
-      });
-
-      function validateForm() {
-       
-        const blog_title = $(".blog_title").val();
-        const blog_description = $(".blog_description").val();
-        const blog_content = $(".blog_content").val();
-        const blog_status = $(".blog_status").val();
-
-        if (blog_title == '' || blog_description == '' || blog_content == '' || blog_status == '') {
-          alert(`Iltimos hamma ma'lumotlarni kiriting!`);
-          return false;
-        } else return true; 
-      }
-    </script>
-  </body>
-
-  <%- include('includes/footer') %>
+    <%- include('includes/footer') %>
