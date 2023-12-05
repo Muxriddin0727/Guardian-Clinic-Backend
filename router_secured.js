@@ -5,7 +5,7 @@ const registerController = require("./controllers/secured/registerController");
 const appointmentController = require("./controllers/secured/appointmentController");
 const blogController = require("./controllers/secured/blogControler");
 const uploader_members = require("./utils/upload-multer")("members");
-const memberController = require ("./controllers/secured/member.Controller")
+const memberController = require("./controllers/secured/member.Controller");
 
 router_secured.get("/", doctorController.home);
 //Register//
@@ -25,9 +25,16 @@ router_secured.get("/logout", registerController.logout);
 router_secured.get("/check-me", doctorController.checkSessions);
 
 //Others//
-router_secured.get("/doctor/dashboard", 
-doctorController.getDoctorDshboard,
+router_secured.get(
+  "/doctor/dashboard/:date",
+  doctorController.getDoctorDshboard
 );
+
+router_secured.get("/doctor/dashboard/data/:date", (req, res, next) => {
+  console.log("Request received for /doctor/dashboard/data/:date");
+  next();
+}, doctorController.getDoctorDashboardData);
+
 router_secured.post(
   "/blogs/create",
   doctorController.validateDoctor,
@@ -45,7 +52,7 @@ router_secured.get(
   memberController.getAllDoctors
 );
 
-router_secured.post (
+router_secured.post(
   "/all-doctors/edit",
   memberController.validateAdmin,
   memberController.updateDoctorsByAdmin

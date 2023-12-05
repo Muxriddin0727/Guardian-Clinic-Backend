@@ -61,6 +61,27 @@ blogController.likeBlogChosen = async (req, res) => {
     console.log(`ERROR, client/likeBlogChosen, ${err.message}`);
     res.json({ state: "fail", message: err.message });
   }
+};  
+
+blogController.getBlogsLikedByUser = async (req, res) => {
+  try {
+    console.log("GET: client/getBlogsLikedByUser");
+    const { id } = req.params; // get id from request params
+    console.log("id: ", id);
+
+    // Find all blogs where the user is in the blog_likes array
+    const likedBlogs = await blogModel.find({ 
+      blog_likes: id
+    });
+
+    if (!likedBlogs)
+      return res.status(404).json({ message: "No blogs found liked by this user" });
+
+    res.json({ state: "success", blogs: likedBlogs });
+  } catch (err) {
+    console.log(`ERROR, client/getBlogsLikedByUser, ${err.message}`);
+    res.json({ state: "fail", message: err.message });
+  }
 };
 
 blogController.viewBlogChosen = async (req, res) => {

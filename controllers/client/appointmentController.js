@@ -96,6 +96,55 @@ appointmentController.createAppointment = async (req, res) => {
   }
 };
 
+appointmentController.getAppointmentsForUser = async (req, res) => {
+  try {
+    console.log("GET: client/getAppointmentsForUser");
+    const { id } = req.params; 
+    console.log("id:", id);
+
+    // Get all appointments
+    const appointments = await appointmentModel.find();
+    console.log("appointments", appointments);
+
+    const mappedAppointments = await Promise.all(
+      appointments.map(async (appointment) => {
+        // Only iterate over slots if appointment and appointment.slots are defined
+        if (appointment && appointment.slots) {
+          return {
+            ...appointment._doc,
+            slots: await Promise.all(
+              appointment.slots.map(async (slotValue) => {
+                if (!slotValue.ref_id) return slotValue;
+                const member = await memberModel.findById(slotValue.ref_id);
+                return {
+                  ...slotValue,
+                  patientName: member.mb_name,
+                  patientContact: member.mb_email,
+                  appointmentDate: `${appointment.date} - ${slotValue.start} : ${slotValue.end}`,
+                };
+              })
+            ),
+          };
+        } else {
+          return null;
+        }
+      })
+    );
+    const filteredAppointments = mappedAppointments.filter(appointment => appointment !== null);
+
+    console.log("mappeAppointments", mappedAppointments);
+
+    res.json ({state: "success", 
+      appointment_data: filteredAppointments[0],
+    });
+
+  } catch (err) {
+    console.log(`ERROR, secued/getDoctorDashboard , ${err.message}`);
+    res.status(500).json({ message: err.message }); // send a response with the error message
+  }
+};
+
+
 appointmentController.updateAppointment = async (req, res) => {
   try {
     console.log("POST: client/updateAppointment");

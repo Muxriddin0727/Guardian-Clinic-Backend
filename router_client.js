@@ -59,6 +59,11 @@ router_client.post(
   memberController.commentOnMember
 );
 
+router_client.get(
+  "/get-comments",
+  memberController.getComments
+);
+
 //Blogs//
 router_client.get("/blogs", blogController.getAllBlogs);
 
@@ -80,6 +85,7 @@ router_client.get(
   blogController.viewBlogChosen
 );
 
+router_client.get("/liked-blogs/:id", blogController.getBlogsLikedByUser);
 //Appointments//
 router_client.get(
   "/appointments",
@@ -98,6 +104,8 @@ router_client.post(
   memberController.retrieveAtuhMember,
   appointmentController.createAppointment
 );
+
+router_client.get("/get-appointments/:id", appointmentController.getAppointmentsForUser);
 
 router_client.post(
   "/update-appointment/:id",
