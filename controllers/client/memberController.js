@@ -51,12 +51,12 @@ memberController.getChosenMember = async (req, res) => {
 
 memberController.likeMemberChosen = async (req, res) => {
   try {
-    const {mb_id, _id} = req.body; 
+    const { mb_id, _id } = req.body;
     console.log("POST: client/likeMemberChosen");
 
     const found_member = await memberModel.findById(mb_id);
     if (found_member.mb_likes.includes(_id)) {
-      found_member.mb_likes =  found_member.mb_likes.filter((id) => id !== _id);
+      found_member.mb_likes = found_member.mb_likes.filter((id) => id !== _id);
     } else {
       found_member.mb_likes = [...found_member.mb_likes, _id];
     }
@@ -65,7 +65,7 @@ memberController.likeMemberChosen = async (req, res) => {
       ...found_member._doc,
     });
 
-    res.json({ state: "success",found_member });
+    res.json({ state: "success", found_member });
   } catch (err) {
     console.log(`ERROR, client/likeMemberChosen, ${err.message}`);
     res.json({ state: "fail", message: err.message });
@@ -74,14 +74,14 @@ memberController.likeMemberChosen = async (req, res) => {
 
 memberController.commentOnMember = async (req, res) => {
   try {
-    const {mb_id, _id, comment} = req.body; 
+    const { mb_id, _id, comment } = req.body;
     console.log("POST: client/commentOnMember");
 
     const found_member = await memberModel.findById(mb_id);
     if (!found_member.mb_comments) {
       found_member.mb_comments = [];
     }
-    found_member.mb_comments.push({userId: _id, text: comment});
+    found_member.mb_comments.push({ userId: _id, text: comment });
 
     await memberModel.findByIdAndUpdate(found_member._id, {
       ...found_member._doc,
@@ -90,6 +90,30 @@ memberController.commentOnMember = async (req, res) => {
     res.json({ state: "success", found_member });
   } catch (err) {
     console.log(`ERROR, client/commentOnMember, ${err.message}`);
+    res.json({ state: "fail", message: err.message });
+  }
+};
+
+memberController.getComments = async (req, res) => {
+  try {
+    console.log("POST: client/getComments");
+
+    // Fetch all members
+    const members = await memberModel.find();
+
+    // Map over the members and their mb_comments arrays
+    const commentsWithAuthor = await Promise.all(members.flatMap(member => 
+      member.mb_comments.map(async (comment) => {
+        return {
+          ...comment._doc,
+          author: member.mb_name
+        };
+      })
+    ));
+
+    res.json({ state: "success", comments: commentsWithAuthor });
+  } catch (err) {
+    console.log(`ERROR, client/getComments, ${err.message}`);
     res.json({ state: "fail", message: err.message });
   }
 };

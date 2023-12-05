@@ -19,7 +19,7 @@ registerController.signup = async (req, res) => {
     assert.ok(result, Definer.general_err1);
 
     req.session.member = result;
-    res.redirect("/secured/doctor/dashboard");
+    res.redirect("/secured/doctor/dashboard/:date");
   } catch (err) {
     console.log(`ERROR, secured/sign_up, ${err.message}`);
     res.json({ state: "fail", message: err.message });
@@ -37,7 +37,7 @@ registerController.login = async (req, res) => {
       req.session.save(function () {
         result.mb_type === "ADMIN"
           ? res.redirect("/secured/all-doctors")
-          : res.redirect("/secured/doctor/dashboard");
+          : res.redirect("/secured/doctor/dashboard/:date");
       });
     } catch (err) {
       console.log(`ERROR, secured/login, ${err.message}`);

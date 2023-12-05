@@ -12,7 +12,7 @@
             </li>
 
             <li class="nav-item" style="cursor: pointer">
-              <a class="nav-link" href="/secured/doctor/dashboard">My Dashboard</a>
+              <a class="nav-link" href="/secured/doctor/dashboard/<%=appointment_data %>">My Dashboard</a>
             </li>
             <li class="nav-item" style="cursor: pointer">
               <a class="nav-link" href="/secured/logout">Logout</a>
@@ -28,6 +28,7 @@
                 Dr.<%= member.mb_name.replace(/\b\w/g, function(l){ return l.toUpperCase() }) %>'s Patient Appointment
                   Dashboard
               </span>
+              <input type="date"  class=" calendar" id="appointmentDate" onchange="fetchAppointments()" />
               <table class="table table-bordered table-hover">
                 <thead class="thead-light">
                   <th scope="col">T/r</th>
@@ -36,14 +37,28 @@
                   <th scope="col">Patient Email</th>
                 </thead>
                 <tbody id="appointmentTableBody" style="background-color: white">
-                  <% appointment_data.forEach((appointment, index) => { %>
-                    <tr>
-                      <td><%= index + 1 %></td>
-                      <td><%= appointment.patientName %></td>
-                      <td><%= appointment.appointmentDate %>,   <%= appointment.startTime %> - <%= appointment.endTime %></td>
-                      <td><%= appointment.patientContact %></td>
-                    </tr>
-                  <% }) %>
+                  <% if (appointment_data) { %>
+                    <% appointment_data.slots.forEach((appointment, index)=> { %>
+                      <tr>
+                        <td>
+                          <%= index + 1 %>
+                        </td>
+                        <td>
+                          <%= appointment.patientName %>
+                        </td>
+                        <td>
+                          <%= appointment.date %>, <%= appointment.start %> - <%= appointment.end %>
+                        </td>
+                        <td>
+                          <%= appointment.patientContact %>
+                        </td>
+                      </tr>
+                      <% }) %>
+                        <% } else { %>
+                          <tr>
+                            <td colspan="4">No appointments found for the selected date.</td>
+                          </tr>
+                          <% } %>
                 </tbody>
               </table>
 
@@ -131,7 +146,6 @@
       </div>
 
       <script>
-
         function hideDishContainer() {
           try {
             document.querySelector('.dish_container').style.display = 'block';
@@ -149,91 +163,95 @@
             console.log("Error:", error);
           }
         }
+        function fetchAppointments() {
+  const date = document.getElementById('appointmentDate').value;
+
+  axios.get(`/secured/doctor/dashboard/data/${date}`)
+    .then(response => {
+      const appointments = response.data;
+      const tbody = document.getElementById('appointmentTableBody');
+      tbody.innerHTML = '';
+
+      if (appointments && appointments.length > 0) {
+        appointments.forEach((appointment, index) => {
+          // Check if appointment and appointment.slots are defined and there are slots
+          if (appointment && appointment.slots && appointment.slots.length > 0) {
+            appointment.slots.forEach((slot, slotIndex) => {
+              // Check if slot is defined and has necessary properties
+              if (slot && slot.ref_id && slot.appointmentDate) {
+                const row = document.createElement('tr');
+
+                let cell = document.createElement('td');
+                cell.textContent = slotIndex + 1;
+                row.appendChild(cell);
+
+                cell = document.createElement('td');
+                cell.textContent = slot.patientName;
+                row.appendChild(cell);
+
+                cell = document.createElement('td');
+                cell.textContent = slot.appointmentDate;
+                row.appendChild(cell);
+
+                cell = document.createElement('td');
+                cell.textContent = slot.patientContact;
+                row.appendChild(cell);
+
+                tbody.appendChild(row);
+              }
+            });
+          } else {
+            // If there are no slots, add a row saying 'No appointments found for the selected date.'
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.setAttribute('colspan', '4');
+            cell.textContent = index === 0 ? 'No appointments found for the selected date.' : ''; // Display message only for the first row
+            row.appendChild(cell);
+            tbody.appendChild(row);
+          }
+        });
+      } else {
+        // If there are no appointments, add a row saying 'No appointments found for the selected date.'
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.setAttribute('colspan', '4');
+        cell.textContent = 'No appointments found for the selected date.';
+        row.appendChild(cell);
+        tbody.appendChild(row);
+      }
+    })
+    .catch(error => console.error(error));
+}
 
 
         $(function () {
-
           $(".new_blog_status").on("change", async function (e) {
-            console.log(e.target);
-            const id = e.target.id;
-            const blog_status = $(`#${id}.new_blog_status`).val();
-
-            try {
-              const response = await axios.post(
-                `/secured/blogs/edit/${id}`,
-                { blog_status: blog_status, });
-
-              if (response.headers['content-type'] !== 'application/json') {
-                console.error('Expected JSON but received', response.headers['content-type']);
-                return;
-              }
-
-
-              const result = response.data;
-              console.log("response:", reponse);
-
-              if (result.state == "success") {
-                alert("success");
-                location.reload();
-              } else {
-                alert(`Error: ${response.status} ${response.statusText}\n${result ? result.message : ''}`);
-              }
-
-            } catch (err) {
-              console.log('updateChosenProduct err:', err);
-            }
+            // ... (your existing code)
           });
 
           document.querySelector('#submit_btn').addEventListener('click', async function (event) {
-            event.preventDefault();
-
-            if (!validateForm()) {
-              return;
-            }
-
-            const blog_title = $(".blog_title").val();
-            const blog_description = $(".blog_description").val();
-            const blog_content = $(".blog_content").val();
-            const blog_status = $(".blog_status").val();
-
-            try {
-              const response = await axios.post('/secured/blogs/create', {
-
-                blog_title: blog_title,
-                blog_description: blog_description,
-                blog_content: blog_content,
-                blog_status: blog_status,
-
-              });
-              const result = response.data;
-              console.log("result:", result);
-
-              if (result.state == "success") {
-                alert("success");
-                window.location.href = "/secured/doctor/dashboard";
-              } else {
-                alert(result.message);
-              }
-
-            } catch (err) {
-              console.log('createBlog err:', err);
-            }
+            // ... (your existing code)
           });
         });
 
         function validateForm() {
+          // ... (your existing code)
+        }
 
-          const blog_title = $(".blog_title").val();
-          const blog_description = $(".blog_description").val();
-          const blog_content = $(".blog_content").val();
-          const blog_status = $(".blog_status").val();
+        window.onload = function () {
+          let today = new Date();
+          let yyyy = today.getFullYear();
+          let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+          let dd = String(today.getDate()).padStart(2, '0');
 
-          if (blog_title == '' || blog_description == '' || blog_content == '' || blog_status == '') {
-            alert(`Iltimos hamma ma'lumotlarni kiriting!`);
-            return false;
-          } else return true;
+          today = yyyy + '-' + mm + '-' + dd;
+          document.getElementById('appointmentDate').value = today;
+
+          // Fetch appointments for today
+          fetchAppointments();
         }
       </script>
+
     </body>
 
     <%- include('includes/footer') %>

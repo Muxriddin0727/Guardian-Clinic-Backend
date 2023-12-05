@@ -29,6 +29,8 @@
   align-items: center;
 }
 
+
+
 .restaurant_container .resto_table {
   position: relative;
   width: 85%;
@@ -37,6 +39,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.calendar{
+  margin: 10px;
+  display: flex;
 }
 
 .switch {
