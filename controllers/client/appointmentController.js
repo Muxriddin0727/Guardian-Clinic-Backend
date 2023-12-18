@@ -25,7 +25,6 @@ appointmentController.getChosenAppointment = async (req, res) => {
     console.log("GET: client/getChosenAppointment ");
     const { ref_id } = req.params;
     const { date } = req.query;
-
     const foundDoctor = await memberModel.findById(ref_id);
 
     if (!foundDoctor)
@@ -60,7 +59,7 @@ appointmentController.createAppointment = async (req, res) => {
     const { date } = req.query;
     const { slot_id, mem_id } = req.body;
 
-    //console.log(`ref_id: ${ref_id}, date: ${date}`); 
+    //console.log(`ref_id: ${ref_id}, date: ${date}`);
 
     const foundDoctor = await memberModel.findById(ref_id);
     //console.log(`foundDoctor: ${JSON.stringify(foundDoctor)}`);
@@ -68,11 +67,12 @@ appointmentController.createAppointment = async (req, res) => {
     if (!foundDoctor)
       return res.status(404).json({ message: "Doctor not found" });
 
-    const foundAppointment = await appointmentModel.findOne({
-      date,
-    });
-
-    //console.log(`foundAppointment: ${JSON.stringify(foundAppointment)}`); 
+    const foundAppointment = await appointmentModel
+      .findOne({
+        date,
+      })
+      .populate("slots.ref_id");
+    console.log(`foundAppointment: ${JSON.stringify(foundAppointment)}`);
 
     if (!foundAppointment)
       return res.status(404).json({ message: "Appointment not found" });
@@ -99,30 +99,49 @@ appointmentController.createAppointment = async (req, res) => {
 appointmentController.getAppointmentsForUser = async (req, res) => {
   try {
     console.log("GET: client/getAppointmentsForUser");
-    const { id } = req.params; 
+    const { id } = req.params;
+
     console.log("id:", id);
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     // Get all appointments
-    const appointments = await appointmentModel.find();
+    const appointments = await appointmentModel.find().populate("doctor_id");
     console.log("appointments", appointments);
 
+    const filteredAppointments = appointments.filter((appointment) => {
+      const appointmentDate = new Date(appointment.date);
+      return appointmentDate >= today;
+    });
+
     const mappedAppointments = await Promise.all(
-      appointments.map(async (appointment) => {
+      filteredAppointments.map(async (appointment) => {
         // Only iterate over slots if appointment and appointment.slots are defined
         if (appointment && appointment.slots) {
           return {
             ...appointment._doc,
             slots: await Promise.all(
-              appointment.slots.map(async (slotValue) => {
-                if (!slotValue.ref_id) return slotValue;
-                const member = await memberModel.findById(slotValue.ref_id);
-                return {
-                  ...slotValue,
-                  patientName: member.mb_name,
-                  patientContact: member.mb_email,
-                  appointmentDate: `${appointment.date} - ${slotValue.start} : ${slotValue.end}`,
-                };
-              })
+              appointment.slots
+                .filter(
+                  (slotValue) =>
+                    slotValue.ref_id && slotValue.start && slotValue.end
+                ) // filter slots that have appointments
+                .map(async (slotValue) => {
+                  const member = await memberModel.findById(slotValue.ref_id);
+                  const doctor = await memberModel.findById(
+                    appointment.doctor_id
+                  );
+                  return {
+                    ...slotValue,
+                    patientName: member.mb_name,
+                    patientContact: member.mb_email,
+                    appointmentDate: `${appointment.date} - ${slotValue.start} : ${slotValue.end}`,
+                    doctorName: doctor.mb_name,
+                    doctorLastname: doctor.mb_last_name,
+                    doctorImg: doctor.mb_image,
+                  };
+                })
             ),
           };
         } else {
@@ -130,20 +149,24 @@ appointmentController.getAppointmentsForUser = async (req, res) => {
         }
       })
     );
-    const filteredAppointments = mappedAppointments.filter(appointment => appointment !== null);
+
+    console.log("mappedAppointments", mappedAppointments);
+
+    const finalAppointments = mappedAppointments.filter(
+      (appointment) => appointment !== null
+    );
 
     console.log("mappeAppointments", mappedAppointments);
 
-    res.json ({state: "success", 
-      appointment_data: filteredAppointments[0],
+    res.json({
+      state: "success",
+      appointment_data: finalAppointments, // return all appointments
     });
-
   } catch (err) {
     console.log(`ERROR, secued/getDoctorDashboard , ${err.message}`);
     res.status(500).json({ message: err.message }); // send a response with the error message
   }
 };
-
 
 appointmentController.updateAppointment = async (req, res) => {
   try {

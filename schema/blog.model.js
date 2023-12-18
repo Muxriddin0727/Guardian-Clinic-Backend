@@ -1,9 +1,15 @@
 const mongoose = require("mongoose");
-const {
-  blog_status_enums,
-} = require("../lib/config");
+const { blog_status_enums } = require("../lib/config");
 
 const Schema = mongoose.Schema;
+
+const commentSchema = new mongoose.Schema({
+  _id: Schema.Types.ObjectId,
+  mb_name: String, // author of comment
+  comment_content: String, // content of comment
+  mb_image: String, // author image of comment
+  posted_at: { type: Date, default: Date.now }, // date and time of posting comment
+});
 
 const blogSchema = new mongoose.Schema(
   {
@@ -11,7 +17,7 @@ const blogSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-   
+
     blog_status: {
       type: String,
       required: false,
@@ -27,11 +33,13 @@ const blogSchema = new mongoose.Schema(
       required: true,
     },
 
+    blog_comments: [commentSchema],
+
     blog_content: {
       type: String,
       required: true,
     },
- 
+
     blog_likes: {
       type: Array,
       required: false,
@@ -50,10 +58,12 @@ const blogSchema = new mongoose.Schema(
   },
   { timestamps: true }
 ); // createdAt, updatedAt
+blogSchema.index({ doctor_mb_id: 1, blog_title: 1 }, { unique: true });
 
-blogSchema.index(
-  { doctor_mb_id: 1, blog_title: 1 },
-  { unique: true }
-);
+blogSchema.index({
+  blog_title: "text",
+  blog_description: "text",
+  blog_content: "text",
+});
 
 module.exports = mongoose.model("Blog", blogSchema);

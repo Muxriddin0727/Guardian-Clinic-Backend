@@ -6,25 +6,23 @@ const {
 const memberModel = require("../../schema/member.model");
 const Doctor = require("../../models/Doctor");
 const Member = require("../../models/Member");
-const doctor_category = require("../../lib/config").doctor_category;
 let doctorController = module.exports;
 
 doctorController.get_by_category = async ({ params, query }, res) => {
   try {
     const { route_path } = params;
-    const { type, sort } = query;
+    const { type } = query;
 
     console.log("route_path::::::", route_path);
 
     const profession = mb_profession_enums.includes(route_path.toUpperCase())
       ? route_path.toUpperCase()
-      : "DENTIST";
+      : "DERMATOLOGIST";
 
     let doctors = await memberModel
       .find({ mb_profession: profession })
       .lean()
       .exec();
-    
 
     const type_check = () => {
       switch (type) {
@@ -37,19 +35,6 @@ doctorController.get_by_category = async ({ params, query }, res) => {
       }
     };
 
-    const sort_check = () => {
-      switch (sort) {
-        case "default_sorting":
-          return 0;
-        case "the_cheapest":
-          return 1;
-        case "the_most_expensive":
-          return -1;
-        default:
-          return 0;
-      }
-    };
-    // console.log("before sorting::::::", doctors);
     if (!doctors)
       return res.status(400).json({
         message: "Category not found",
@@ -58,8 +43,7 @@ doctorController.get_by_category = async ({ params, query }, res) => {
     // Convert to JavaScript array and sort
     doctors = doctors.sort((a, b) => {
       return (
-        type_check() * (a.mb_likes - b.mb_likes) ||
-        sort_check() * (a.mb_price - b.mb_price)
+        type_check() * (a.mb_likes - b.mb_likes) 
       );
     });
 
@@ -67,108 +51,53 @@ doctorController.get_by_category = async ({ params, query }, res) => {
       message: "Category found",
       data: doctors,
     });
-  } catch (err) {
+    } catch (err) {
     console.log(`ERROR, cont/get_by_category, ${err.message}`);
     return res.status(500).json({ message: "Could not get category" });
   }
 };
-
 doctorController.get_by_category_id = async ({ params, query }, res) => {
   try {
-    const {route_path, id} = params;
+    const { route_path, id } = params;
 
-    let doctor = await memberModel.findOne({ _id: id }).lean().exec();  
+    console.log(`Attempting to find doctor with id: ${id} in category: ${route_path}`);
+
+    let doctor = await memberModel.findOne({ _id: id }).lean().exec();
+    console.log(`Doctor found: ${doctor ? 'Yes' : 'No'}`);
+
     if (!doctor) {
+      console.log(`Doctor with id: ${id} not found`);
       return res.status(404).json({ message: "Doctor not found" });
     }
 
-    const profession = doctor.mb_profession;
-    if (route_path.toUpperCase() !== profession) {
+    console.log(`Doctor's profession from DB: ${doctor.mb_profession}, Requested category: ${route_path.toUpperCase()}`);
+    if (route_path.toUpperCase() !== doctor.mb_profession) {
+      console.log(`Doctor's profession does not match the category: ${route_path}`);
       return res.status(400).json({ message: "Doctor's profession does not match the category" });
     }
 
+    console.log(`Doctor with id: ${id} found in category: ${route_path}`);
     res.status(200).json({
       message: "Success",
-      data: doctor, route_path
+      data: doctor,
+      route_path
     });
   } catch (err) {
     console.log(`ERROR, client/get_by_category_id, ${err.message}`);
     return res.status(500).json({ message: "Could not get doctor" });
   }
 };
-// doctorController.getDoctorById = async (req, res) => {
-//   try {
-//     let { id } = req.params;
-
-//     if (!id || (typeof id === 'string' && id.length !== 24)) {
-//       return res.status(400).json({ message: "Invalid ID" });
-//     }
-
-//     id = shapeIntoMongooseObjectId(id);
-
-//     const result = await memberModel
-//     .findOne({
-//       _id: id,
-//       mb_status: "ACTIVE",
-//     })
-//     .exec();
-
-//     if (!result) {
-//       return res.status(404).json({ message: "Doctor not found" });
-//     }
-
-//     if (result) {
-//       const member_obj = new Member();
-//       await member_obj.viewChosenItemByMember(result, id, "member");
-//     }
-
-//     return res.status(200).json({ message: "Doctor found", data: result });
-//   } catch (err) {
-//     console.log(`ERROR, cont/getDoctorById, ${err.message}`);
-//     return res.status(500).json({ message: "Could not get doctor" });
-//   }
-// };
-
-// doctorController.getDoctors = async (req, res) => {
-//   try {
-//     console.log("GET: client/getRestaurants");
-//     const data = req.query;
-//     // console.log("query data::::", data);
-//     const doctor = new Doctor();
-//     const result = await doctor.getAllDoctorsData(req.member, data);
-//     res.json({ state: "success", data: result });
-//   } catch (err) {
-//     console.log(`ERROR, cont/getRestaurants, ${err.message}`);
-//     res.json({ state: "fail", message: err.message });
-//   }
-// };
-
-// doctorController.getChosenDoctor = async (req, res) => {
-//   try {
-//     console.log("GET: client/getChosenRestaurant");
-//     const id = req.params.id;
-//     // console.log("id:::::::", id);
-//     const doctor = new Doctor();
-
-//     const result = await doctor.getChosenDoctorData(req.member, id);
-
-//     res.json({ state: "success", data: result });
-//   } catch (err) {
-//     console.log(`ERROR, client/getChosenRestaurant, ${err.message}`);
-//     res.json({ state: "fail", message: err.message });
-//   }
-// };
 
 doctorController.getTopDoctors = async (req, res) => {
   try {
     console.log("GET: client/getTopDoctors");
-    let match = { mb_status: "ACTIVE", mb_type: "DOCTOR" };
+    let match = { mb_status: "ACTIVE", mb_top: "Y" }; // Change "mb_type: 'TOP'" to "mb_top: 'Y'"
 
     // Get top doctors data
     const result = await memberModel
       .find(match)
       .sort({ mb_likes: -1 })
-      .limit(6)
+      .limit(8)
       .exec();
 
     if (!result) {

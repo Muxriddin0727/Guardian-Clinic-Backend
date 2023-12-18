@@ -61,31 +61,18 @@ class Member {
 
   async getChosenMemberData(member, id) {
     try {
-      const auth_mb_id = shapeIntoMongooseObjectId(member?._id);
-
       id = shapeIntoMongooseObjectId(id);
-
-      // console.log("member::::", member);
-
-      let aggregateQuery = [
-        { $match: { _id: id, mb_status: "ACTIVE" } },
-        { $unset: "mb_password" },
-      ];
-
-      if (member) {
-        await this.viewChosenItemByMember(member, id, "member");
-
-        aggregateQuery.push(lookup_auth_member_liked(auth_mb_id));
-        aggregateQuery.push(
-          lookup_auth_member_following(auth_mb_id, "members")
-        );
-      }
-
-      const result = await this.memberModel.aggregate(aggregateQuery).exec();
-
+  
+      const result = await this.memberModel
+        .findOne({
+          _id: id,
+          mb_status: "ACTIVE",
+        })
+        .exec();
+  
       assert.ok(result, Definer.general_err2);
-
-      return result[0];
+  
+      return result;
     } catch (err) {
       throw err;
     }
@@ -112,6 +99,41 @@ class Member {
 
       return true;
     } catch (err) {
+      throw err;
+    }
+  }
+
+  async  getLikesCount(memberId) {
+    const member = await memberModel.findById(member._id);
+    return member ? member.mb_likes.length : 0;
+  }
+
+  async updateMemberData(id, data,image) {
+    try {
+      const mb_id = shapeIntoMongooseObjectId(id);
+  
+      let params = {
+        mb_name: data.name,
+        mb_last_name: data.surname,
+        mb_username: data.username,
+        mb_email: data.email,
+        mb_phone: data.phone_number,
+        mb_image: image ? image.path : null
+      };
+  
+      for(let prop in params) if (!params[prop]) delete params[prop];
+      console.log(`Updating member with id: ${mb_id} and params: ${JSON.stringify(params)}`);
+      const result = await this.memberModel
+      .findOneAndUpdate(
+        {_id: mb_id}, 
+        params, 
+        {runValidators:true, lean:true, returnDocument: "after"}
+        ).exec();
+      console.log(`Update result: ${JSON.stringify(result)}`);
+      assert.ok (result, Definer.general_err1);
+      return result;
+    }catch (err){
+      console.log(`Error updating member: ${err}`);
       throw err;
     }
   }

@@ -7,21 +7,38 @@ const doctorController = require("./controllers/client/doctorController");
 const categoryController = require("./controllers/client/categoryController");
 const appointmentController = require("./controllers/client/appointmentController");
 const slotController = require("./controllers/client/slotController");
+const uploader_members = require("./utils/upload-multer")("members");
+
 //Register//
 router_client.post("/sign-up", registerController.signup);
 router_client.post("/login", registerController.login);
 router_client.get("/logout", registerController.logout);
 
+
+router_client.get('/check-token', memberController.retrieveAtuhMember, (req, res) => {
+  if (req.member) {
+    res.status(200).send({ valid: true });
+  } else {
+    res.status(500).send({ valid: false, message: 'Failed to authenticate token.' });
+  }
+});
 //Member//
 router_client.get(
-  "/member/:id",
+  "/member-data",
   memberController.retrieveAtuhMember,
   memberController.getChosenMember
 );
-router_client.get(
-  "/top-doctors",
-  doctorController.getTopDoctors
+
+
+
+router_client.post(
+  "/member-update",
+  uploader_members.single('profile_photo'), 
+  memberController.retrieveAtuhMember,
+  memberController.updateMember
 );
+
+router_client.get("/top-doctors", doctorController.getTopDoctors);
 
 router_client.get(
   "/category",
@@ -41,11 +58,6 @@ router_client.get(
   doctorController.get_by_category_id
 );
 
-// router_client.get(
-//   "/category/:id",
-//   memberController.retrieveAtuhMember,
-//   doctorController.get_by_category_id
-// );
 
 router_client.post(
   "/member-liken",
@@ -60,9 +72,11 @@ router_client.post(
 );
 
 router_client.get(
-  "/get-comments",
-  memberController.getComments
+  "/member-comment-home",
+  memberController.getCommentsForHome
 );
+
+router_client.get("/member-comments/:mb_id", memberController.getComments);
 
 //Blogs//
 router_client.get("/blogs", blogController.getAllBlogs);
@@ -73,19 +87,35 @@ router_client.get(
   blogController.getChosenBlog
 );
 
+router_client.get(
+  "/get-doctor-blogs/:id",
+  memberController.retrieveAtuhMember,
+  blogController.getDoctorBlogs
+);
+
 router_client.post(
   "/blog-liken",
   memberController.retrieveAtuhMember,
   blogController.likeBlogChosen
 );
 
-router_client.get(
-  "/blogs/:id",
+router_client.post(
+  "/view-blog",
   memberController.retrieveAtuhMember,
   blogController.viewBlogChosen
 );
 
+router_client.post(
+  "/blog-comment",
+  memberController.retrieveAtuhMember,
+  blogController.commentOnBlog
+);
+
+router_client.get("/blog-comments/:blog_id", blogController.getBlogComments);
+
 router_client.get("/liked-blogs/:id", blogController.getBlogsLikedByUser);
+
+router_client.get("/search", blogController.getSearch);
 //Appointments//
 router_client.get(
   "/appointments",
@@ -105,49 +135,9 @@ router_client.post(
   appointmentController.createAppointment
 );
 
-router_client.get("/get-appointments/:id", appointmentController.getAppointmentsForUser);
-
-router_client.post(
-  "/update-appointment/:id",
-  memberController.retrieveAtuhMember,
-  appointmentController.updateAppointment
-);
-
-router_client.post(
-  "/remove-appointment/:id",
-  memberController.retrieveAtuhMember,
-  appointmentController.removeAppointment
-);
-
-//Slots//
 router_client.get(
-  "/slots",
-  memberController.retrieveAtuhMember,
-  slotController.getAllSlots
-);
-
-router_client.get(
-  "/slots/:id",
-  memberController.retrieveAtuhMember,
-  slotController.getChosenSlot
-);
-
-router_client.post(
-  "/create-slot",
-  memberController.retrieveAtuhMember,
-  slotController.createSlot
-);
-
-router_client.post(
-  "/update-slot/:id",
-  memberController.retrieveAtuhMember,
-  slotController.updateSlot
-);
-
-router_client.post(
-  "/remove-slot/:id",
-  memberController.retrieveAtuhMember,
-  slotController.removeSlot
+  "/get-appointments/:id",
+  appointmentController.getAppointmentsForUser
 );
 
 module.exports = router_client;

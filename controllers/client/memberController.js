@@ -1,5 +1,6 @@
 const assert = require("assert");
 const Member = require("../../models/Member");
+const { shapeIntoMongooseObjectId } = require("../../lib/config");
 const jwt = require("jsonwebtoken");
 const Definer = require("../../lib/mistake");
 const memberModel = require("../../schema/member.model");
@@ -23,19 +24,22 @@ memberController.checkMyAuthentication = (req, res) => {
 
 memberController.retrieveAtuhMember = (req, res, next) => {
   try {
-    const token = req.headers["authorization"].split(" ")[1];
-    req.member = token ? jwt.verify(token, process.env.SECRET_TOKEN) : null;
-    return next();
+    const authHeader = req.headers["authorization"];
+    if (authHeader) {
+      const token = authHeader.split(" ")[1];
+      req.member = jwt.verify(token, process.env.SECRET_TOKEN);
+    }
+    next();
   } catch (err) {
     console.log(`ERROR, client/retrieveAtuhMember, ${err.message}`);
-    return res.status(403).json({ message: Definer.auth_err3 });
+    next();
   }
 };
 
 memberController.getChosenMember = async (req, res) => {
   try {
     console.log("GET: client/getChosenMember");
-    const id = req.params.id;
+    const id = req.member;
 
     // console.log(req.member);
 
@@ -51,43 +55,62 @@ memberController.getChosenMember = async (req, res) => {
 
 memberController.likeMemberChosen = async (req, res) => {
   try {
-    const { mb_id, _id } = req.body;
-    console.log("POST: client/likeMemberChosen");
+    const {mb_id,  _id } = req.body; 
+    console.log("POST: client/likeBlogChosen");
 
     const found_member = await memberModel.findById(mb_id);
-    if (found_member.mb_likes.includes(_id)) {
-      found_member.mb_likes = found_member.mb_likes.filter((id) => id !== _id);
+    console.log("found_member: ", found_member);
+    if (found_member) {
+      if (found_member.mb_likes.includes(_id)) {
+        found_member.mb_likes = found_member.mb_likes.filter((id) => id !== _id);
+      } else {
+        found_member.mb_likes = [...found_member.mb_likes, _id];
+      }
+
+      await memberModel.findByIdAndUpdate(found_member._id, {
+        mb_likes: found_member.mb_likes,
+      });
+
+      // Return the updated likes in the response
+      res.json({state: 'success', mb_likes: found_member.mb_likes});
     } else {
-      found_member.mb_likes = [...found_member.mb_likes, _id];
+      throw new Error('Member not found');
     }
 
-    await memberModel.findByIdAndUpdate(found_member._id, {
-      ...found_member._doc,
-    });
-
-    res.json({ state: "success", found_member });
   } catch (err) {
-    console.log(`ERROR, client/likeMemberChosen, ${err.message}`);
+    console.log(`ERROR, client/likeBlogChosen, ${err.message}`);
     res.json({ state: "fail", message: err.message });
   }
 };
 
 memberController.commentOnMember = async (req, res) => {
   try {
-    const { mb_id, _id, comment } = req.body;
+    const { mb_id, mb_name, _id, comment_content, mb_image } = req.body;
     console.log("POST: client/commentOnMember");
 
     const found_member = await memberModel.findById(mb_id);
     if (!found_member.mb_comments) {
       found_member.mb_comments = [];
     }
-    found_member.mb_comments.push({ userId: _id, text: comment });
 
-    await memberModel.findByIdAndUpdate(found_member._id, {
-      ...found_member._doc,
-    });
+    const newComment = {
+      _id: shapeIntoMongooseObjectId(_id),
+      mb_name: mb_name,
+      comment_content: comment_content,
+      mb_image: mb_image,
+      posted_at: Date.now(),
+    };
+    found_member.mb_comments.push(newComment);
 
-    res.json({ state: "success", found_member });
+    const updated_member = await memberModel.findByIdAndUpdate(
+      found_member._id,
+      {
+        mb_comments: found_member.mb_comments,
+      },
+      { new: true }
+    );
+
+    res.json({ state: "success", member: updated_member });
   } catch (err) {
     console.log(`ERROR, client/commentOnMember, ${err.message}`);
     res.json({ state: "fail", message: err.message });
@@ -96,22 +119,41 @@ memberController.commentOnMember = async (req, res) => {
 
 memberController.getComments = async (req, res) => {
   try {
-    console.log("POST: client/getComments");
+    const { mb_id } = req.params;
 
-    // Fetch all members
-    const members = await memberModel.find();
+    const found_member = await memberModel.findById(mb_id);
+    if (!found_member) {
+      return res
+        .status(404)
+        .json({ state: "fail", message: "Member not found" });
+    }
+    const sorted_comments = found_member.mb_comments.sort(
+      (a, b) => new Date(b.posted_at) - new Date(a.posted_at)
+    );
 
-    // Map over the members and their mb_comments arrays
-    const commentsWithAuthor = await Promise.all(members.flatMap(member => 
-      member.mb_comments.map(async (comment) => {
-        return {
-          ...comment._doc,
-          author: member.mb_name
-        };
-      })
-    ));
+    res.json({ state: "success", comments: sorted_comments });
+  } catch (err) {
+    console.log(`ERROR, client/getComments, ${err.message}`);
+    res.json({ state: "fail", message: err.message });
+  }
+};
 
-    res.json({ state: "success", comments: commentsWithAuthor });
+memberController.getCommentsForHome = async (req, res) => {
+  try {
+    const random_comments = await memberModel.aggregate([
+      { $unwind: "$mb_comments" },
+      { $sample: { size: 3 } },
+      {
+        $project: {
+          comments: "$mb_comments",
+        },
+      },
+    ]);
+
+    res.json({
+      state: "success",
+      comments: random_comments.map((comment) => comment.comments),
+    });
   } catch (err) {
     console.log(`ERROR, client/getComments, ${err.message}`);
     res.json({ state: "fail", message: err.message });

@@ -13,42 +13,7 @@ class Blog {
     this.blogModel = BlogModel;
   }
 
-  async getAllBlogsData(member, data) {
-    try {
-      const auth_mb_id = shapeIntoMongooseObjectId(member?._id);
-
-      let match = { blog_status: "PROCESS" };
-
-      const sort = { blog_likes: -1 };
-      const page = Number.isInteger(data.page) ? data.page : 1;
-      const limit = Number.isInteger(data.limit) ? data.limit : 12;
-
-      const result = await this.blogModel
-      .aggregate([
-        { $match: match },
-        { $sort: sort },
-        { $skip: (page - 1) * limit },
-        { $limit: limit },
-        {
-          $lookup: {
-            from: "members", 
-            localField: "doctor_mb_id",
-            foreignField: "_id",
-            as: "member_data"
-          }
-        },
-        { $unwind: "$member_data" },
-        lookup_auth_member_liked(auth_mb_id),
-      ])
-      .exec();
-      
-
-      assert.ok(result, Definer.general_err1);
-      return result;
-    } catch (err) {
-      throw err;
-    }
-  }
+  
 
   async getChosenBlogsData(member, id) {
     try {
@@ -76,6 +41,8 @@ class Blog {
           {
             $unwind: "$author", // Flatten the author data
           },
+          { $addFields: { comments: "$blog_comments" } }, 
+
         ])
         .exec();
         // console.log("result:", result);
@@ -109,6 +76,7 @@ class Blog {
       throw err;
     }
   }
+
 
   async updateChosenBlogData(id, updated_data, mb_id) {
     try {

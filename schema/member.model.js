@@ -7,7 +7,16 @@ const {
   ordinary_enums,
 } = require("../lib/config");
 
-// const mb_profession_values = Object.values(mb_profession_enums);
+const Schema = mongoose.Schema;
+
+const commentSchema = new mongoose.Schema({
+  _id: Schema.Types.ObjectId,
+  mb_name: String, // author of comment
+  comment_content: String, // content of comment
+  mb_image: String, // author image of comment
+  posted_at: { type: Date, default: Date.now }, // date and time of posting comment
+});
+
 
 
 const memberSchema = new mongoose.Schema(
@@ -128,36 +137,18 @@ const memberSchema = new mongoose.Schema(
       default: [].length,
     },
 
-    mb_comments: {
-      type: [
-        {
-          userId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-            required: true
-          },
-          text: {
-            type: String,
-            required: true
-          },
-          timestamp: {
-            type: Date,
-            default: Date.now
-          }
-        }
-      ],
-      default: []
-    },
+    mb_comments: [commentSchema],
+    
 
     mb_price: {
       type: Number,
       required: false,
       default: 0,
     },
-    mb_follow_cnt: {
-      type: Number,
+    mb_follow: {
+      type: Array,
       required: false,
-      default: 0,
+      default: [].length,
     },
     mb_subscriber_cnt: {
       type: Number,
