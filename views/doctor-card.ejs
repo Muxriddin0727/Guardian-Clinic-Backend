@@ -226,16 +226,83 @@
 
         $(function () {
           $(".new_blog_status").on("change", async function (e) {
-            // ... (your existing code)
+            console.log(e.target);
+          const id = e.target.id;
+          const blog_status = $(`#${id}.new_blog_status`).val();
+
+          try {
+            const response = await axios.post(
+              `/secured/blogs/edit/${id}`,
+              { blog_status: blog_status,});
+
+            if (response.headers['content-type'] !== 'application/json') {
+              console.error('Expected JSON but received', response.headers['content-type']);
+              return;
+            }
+
+
+            const result = response.data;
+            console.log("response:", reponse);
+
+            if (result.state == "success") {
+              alert("success");
+              location.reload();
+            } else {
+              alert(`Error: ${response.status} ${response.statusText}\n${result ? result.message : ''}`);
+            }
+
+          } catch (err) {
+            console.log('updateChosenProduct err:', err);
+          }
           });
 
           document.querySelector('#submit_btn').addEventListener('click', async function (event) {
-            // ... (your existing code)
+            event.preventDefault();
+
+          if (!validateForm()) {
+            return;
+          }
+         
+          const blog_title = $(".blog_title").val();
+          const blog_description = $(".blog_description").val();
+          const blog_content = $(".blog_content").val();
+          const blog_status = $(".blog_status").val();
+
+          try {
+            const response = await axios.post('/secured/blogs/create', {
+             
+              blog_title: blog_title,
+              blog_description: blog_description,
+              blog_content: blog_content,
+              blog_status: blog_status,
+             
+            });
+            const result = response.data;
+            console.log("result:", result);
+
+            if (result.state == "success") {
+              alert("success");
+              window.location.href = "/secured/doctor/dashboard";
+            } else {
+              alert(result.message);
+            }
+
+          } catch (err) {
+            console.log('createBlog err:', err);
+          }
           });
         });
 
         function validateForm() {
-          // ... (your existing code)
+          const blog_title = $(".blog_title").val();
+        const blog_description = $(".blog_description").val();
+        const blog_content = $(".blog_content").val();
+        const blog_status = $(".blog_status").val();
+
+        if (blog_title == '' || blog_description == '' || blog_content == '' || blog_status == '') {
+          alert(`Iltimos hamma ma'lumotlarni kiriting!`);
+          return false;
+        } else return true;
         }
 
         window.onload = function () {
