@@ -30,6 +30,8 @@ router_secured.get(
   doctorController.getDoctorDshboard
 );
 
+
+
 router_secured.get("/doctor/dashboard/data/:date", (req, res, next) => {
   console.log("Request received for /doctor/dashboard/data/:date");
   next();
