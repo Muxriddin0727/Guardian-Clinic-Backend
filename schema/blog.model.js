@@ -5,10 +5,10 @@ const Schema = mongoose.Schema;
 
 const commentSchema = new mongoose.Schema({
   _id: Schema.Types.ObjectId,
-  mb_name: String, // author of comment
-  comment_content: String, // content of comment
-  mb_image: String, // author image of comment
-  posted_at: { type: Date, default: Date.now }, // date and time of posting comment
+  mb_name: String, 
+  comment_content: String, 
+  mb_image: String, 
+  posted_at: { type: Date, default: Date.now }, 
 });
 
 const blogSchema = new mongoose.Schema(

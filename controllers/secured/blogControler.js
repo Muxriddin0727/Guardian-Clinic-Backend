@@ -12,7 +12,7 @@ blogController.addNewBlog = async (req, res) => {
 
     const blog = new Blog();
     let data = req.body;
-
+    console.log("Request body:", req.body);
     // console.log(req.session);
 
     const result = await blog.addNewBlogData(data, req.member);
