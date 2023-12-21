@@ -55,14 +55,14 @@ appointmentController.getChosenAppointment = async (req, res) => {
 appointmentController.createAppointment = async (req, res) => {
   try {
     console.log("POST: client/createAppointment");
-    const { ref_id } = req.params;
+    const { ref_id } = req.params; // doctor_id
     const { date } = req.query;
-    const { slot_id, mem_id } = req.body;
+    const { slot_id, mem_id, slot_time } = req.body; // add slot_time to the request body
 
-    //console.log(`ref_id: ${ref_id}, date: ${date}`);
+    console.log(`ref_id: ${ref_id}, date: ${date}`);
 
     const foundDoctor = await memberModel.findById(ref_id);
-    //console.log(`foundDoctor: ${JSON.stringify(foundDoctor)}`);
+    console.log(`foundDoctor: ${JSON.stringify(foundDoctor)}`);
 
     if (!foundDoctor)
       return res.status(404).json({ message: "Doctor not found" });
@@ -70,26 +70,51 @@ appointmentController.createAppointment = async (req, res) => {
     const foundAppointment = await appointmentModel
       .findOne({
         date,
-      })
-      .populate("slots.ref_id");
-    console.log(`foundAppointment: ${JSON.stringify(foundAppointment)}`);
+      });
 
-    if (!foundAppointment)
-      return res.status(404).json({ message: "Appointment not found" });
+    if (!foundAppointment) {
+      // If no appointment exists for the date, create a new one
+      const createData = await appointmentModel.create({
+        date,
+        slots: [{
+          slot_time,
+          doctor_id: foundDoctor._id,
+          user_id: mem_id
+        }]
+      });
 
-    if (foundAppointment.doctor_id != foundDoctor._id)
-      return res.status(400).json({ message: "Refered Doctor does not match" });
+      return res
+        .status(200)
+        .json({ message: "Appointment created", slots: createData.slots });
+    } else {
+      // If an appointment exists for the date, check if the slot is available
+      const slot = foundAppointment.slots.find(slot => 
+        slot.doctor_id === ref_id && slot.slot_time === slot_time
+      );
 
-    await appointmentModel.findByIdAndUpdate(foundAppointment._id, {
-      ...foundAppointment._doc,
-      slots: foundAppointment.slots.map((value) =>
-        value._id === slot_id ? { ...value, ref_id: mem_id } : value
-      ),
-    }),
+      if (slot && slot.user_id) {
+        // If the slot exists and is already booked, return an error
+        return res.status(400).json({ message: "Slot is already booked" });
+      } else if (slot) {
+        // If the slot exists and is not booked, assign the user to the slot
+        slot.user_id = mem_id;
+      } else {
+        // If the slot does not exist, create it
+        foundAppointment.slots.push({
+          slot_time,
+          doctor_id: foundDoctor._id,
+          user_id: mem_id
+        });
+      }
+
+      // Save the updated appointment
+      await foundAppointment.save();
+
       res.json({
         state: "success",
         extraMessage: "Appointment created",
       });
+    }
   } catch (err) {
     console.log(`ERROR, client/createAppointment, ${err.message}`);
     res.json({ state: "fail", message: err.message });

@@ -1,6 +1,7 @@
 const assert = require("assert");
 const Definer = require("../../lib/mistake");
 const Member = require("../../models/Member");
+const { MongoServerError } = require('mongodb');
 
 let registerController = module.exports;
 
@@ -22,6 +23,10 @@ registerController.signup = async (req, res) => {
     res.redirect("/secured/doctor/dashboard/:date");
   } catch (err) {
     console.log(`ERROR, secured/sign_up, ${err.message}`);
+    if (err instanceof MongoServerError && err.code === 11000) {
+      return res.status(400).json({ message: 'Username already exists' });
+    }
+    else
     res.json({ state: "fail", message: err.message });
   }
 };

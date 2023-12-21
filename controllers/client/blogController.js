@@ -7,8 +7,7 @@ let blogController = module.exports;
 blogController.getAllBlogs = async (req, res) => {
   try {
     console.log("POST: client/getAllBlogs");
-    const blog = new Blog();
-    const result = await blog.getAllBlogsData(req.member, req.body);
+    const result = await blogModel.find({}).exec();
     res.json({ state: "success", data: result });
   } catch (err) {
     console.log(`ERROR, client/getAllBlogs, ${err.message}`);
@@ -20,9 +19,10 @@ blogController.getSearch = async (req, res) => {
   try {
     console.log("POST: client/getSerchBlogs");
     const searchQuery = req.query.search;
-    const blogs = await blogModel.find({ $text : { $search: searchQuery } })
-    .exec();
-    
+    const blogs = await blogModel
+      .find({ $text: { $search: searchQuery } })
+      .exec();
+
     res.json({ state: "success", data: blogs });
   } catch (err) {
     console.log(`ERROR, client/getSerchBlogs, ${err.message}`);
@@ -32,15 +32,17 @@ blogController.getSearch = async (req, res) => {
 
 blogController.getDoctorBlogs = async (req, res) => {
   try {
-    let doctorId = req.params.id; 
+    let doctorId = req.params.id;
     doctorId = shapeIntoMongooseObjectId(doctorId);
     console.log("POST: client/getAllBlogs");
-    
-    const blogs = await blogModel.find({doctor_mb_id: doctorId});
-    if (!blogs || blogs.length === 0) { 
-      return res.status(404).json({state: "fail", message: "Blogs not found"});
+
+    const blogs = await blogModel.find({ doctor_mb_id: doctorId });
+    if (!blogs || blogs.length === 0) {
+      return res
+        .status(404)
+        .json({ state: "fail", message: "Blogs not found" });
     }
-    res.json({ state: "success", data: blogs});
+    res.json({ state: "success", data: blogs });
   } catch (err) {
     console.log(`ERROR, client/getAllBlogs, ${err.message}`);
     res.json({ state: "fail", message: err.message });
@@ -52,10 +54,15 @@ blogController.getChosenBlog = async (req, res) => {
     console.log("GET: client/getChosenBlog ");
     const blog = new Blog();
     const id = req.params.id;
-    const result = await blog.getChosenBlogsData(req.member, id);
+    const member = req.member || null; 
+    const result = await blog.getChosenBlogsData(member, id);
 
-    // Increment blog_views
-    await blogModel.findByIdAndUpdate(id, { $push: { blog_views: req.member._id} });
+    // Increment blog_views only if member is logged in
+    if (member && member._id) {
+      await blogModel.findByIdAndUpdate(id, {
+        $push: { blog_views: member._id },
+      });
+    }
 
     res.json({ state: "success", data: result });
   } catch (err) {
@@ -63,6 +70,7 @@ blogController.getChosenBlog = async (req, res) => {
     res.json({ state: "fail", message: err.message });
   }
 };
+
 blogController.getBlogWithOwner = async (req, res) => {
   try {
     const blog = new Blog();
@@ -80,6 +88,11 @@ blogController.likeBlogChosen = async (req, res) => {
     console.log("POST: client/likeBlogChosen");
 
     const found_blog = await blogModel.findById(blog_id);
+    if (!found_blog) {
+      console.log(`Blog not found with id: ${blog_id}`);
+      return res.status(404).json({ message: 'Blog not found' });
+    }
+
     if (found_blog.blog_likes.includes(_id)) {
       found_blog.blog_likes = found_blog.blog_likes.filter((id) => id !== _id);
     } else {
@@ -96,6 +109,8 @@ blogController.likeBlogChosen = async (req, res) => {
     res.json({ state: "fail", message: err.message });
   }
 };
+
+
 blogController.commentOnBlog = async (req, res) => {
   try {
     const { blog_id, _id, mb_name, comment_content, mb_image } = req.body;
@@ -175,7 +190,7 @@ blogController.viewBlogChosen = async (req, res) => {
     console.log("POST: client/viewBlogChosen");
 
     await blogModel.findByIdAndUpdate(blog_id, {
-      $push: { blog_views: _id }
+      $push: { blog_views: _id },
     });
 
     res.json({ state: "success" });

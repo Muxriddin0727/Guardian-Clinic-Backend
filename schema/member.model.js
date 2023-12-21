@@ -129,12 +129,17 @@ const memberSchema = new mongoose.Schema(
     mb_views: {
       type: Array,
       required: false,
-      default: [].length,
+      default: [],
+    },
+    mb_follow: {
+      type: Array,
+      required: false,
+      default: [],
     },
     mb_likes: {
       type: Array,
       required: false,
-      default: [].length,
+      default: [],
     },
 
     mb_comments: [commentSchema],

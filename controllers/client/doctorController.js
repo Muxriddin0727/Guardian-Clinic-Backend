@@ -8,6 +8,13 @@ const Doctor = require("../../models/Doctor");
 const Member = require("../../models/Member");
 let doctorController = module.exports;
 
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
 doctorController.get_by_category = async ({ params, query }, res) => {
   try {
     const { route_path } = params;
@@ -24,63 +31,66 @@ doctorController.get_by_category = async ({ params, query }, res) => {
       .lean()
       .exec();
 
-    const type_check = () => {
-      switch (type) {
-        case "all-doctors":
-          return 0;
-        case "top-doctors":
-          return -1;
-        default:
-          return 0;
-      }
-    };
+    console.log("type:", type);
 
     if (!doctors)
       return res.status(400).json({
         message: "Category not found",
       });
 
-    // Convert to JavaScript array and sort
-    doctors = doctors.sort((a, b) => {
-      return (
-        type_check() * (a.mb_likes - b.mb_likes) 
-      );
-    });
+    if (type === "all-doctors") {
+      // Shuffle the array for "all-doctors"
+      shuffleArray(doctors);
+    } else if (type === "top-doctors") {
+      // Sort by likes for "top-doctors"
+      doctors.sort((a, b) => b.mb_likes.length - a.mb_likes.length);
+    }
 
     return res.status(200).json({
       message: "Category found",
       data: doctors,
     });
-    } catch (err) {
+  } catch (err) {
     console.log(`ERROR, cont/get_by_category, ${err.message}`);
     return res.status(500).json({ message: "Could not get category" });
   }
 };
+
 doctorController.get_by_category_id = async ({ params, query }, res) => {
   try {
     const { route_path, id } = params;
 
-    console.log(`Attempting to find doctor with id: ${id} in category: ${route_path}`);
+    console.log(
+      `Attempting to find doctor with id: ${id} in category: ${route_path}`
+    );
 
     let doctor = await memberModel.findOne({ _id: id }).lean().exec();
-    console.log(`Doctor found: ${doctor ? 'Yes' : 'No'}`);
+    console.log(`Doctor found: ${doctor ? "Yes" : "No"}`);
 
     if (!doctor) {
       console.log(`Doctor with id: ${id} not found`);
       return res.status(404).json({ message: "Doctor not found" });
     }
 
-    console.log(`Doctor's profession from DB: ${doctor.mb_profession}, Requested category: ${route_path.toUpperCase()}`);
+    console.log(
+      `Doctor's profession from DB: ${
+        doctor.mb_profession
+      }, Requested category: ${route_path.toUpperCase()}`
+    );
     if (route_path.toUpperCase() !== doctor.mb_profession) {
-      console.log(`Doctor's profession does not match the category: ${route_path}`);
-      return res.status(400).json({ message: "Doctor's profession does not match the category" });
+      console.log(
+        `Doctor's profession does not match the category: ${route_path}`
+      );
+      return res
+        .status(400)
+        .json({ message: "Doctor's profession does not match the category" });
     }
 
     console.log(`Doctor with id: ${id} found in category: ${route_path}`);
     res.status(200).json({
       message: "Success",
       data: doctor,
-      route_path
+      route_path,
     });
   } catch (err) {
     console.log(`ERROR, client/get_by_category_id, ${err.message}`);

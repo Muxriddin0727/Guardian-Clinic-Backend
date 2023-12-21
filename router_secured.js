@@ -25,6 +25,8 @@ router_secured.get("/logout", registerController.logout);
 router_secured.get("/check-me", doctorController.checkSessions);
 
 //Others//
+
+
 router_secured.get(
   "/doctor/dashboard/:date",
   doctorController.getDoctorDshboard

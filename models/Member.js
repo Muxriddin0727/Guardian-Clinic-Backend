@@ -80,29 +80,33 @@ class Member {
 
   async viewChosenItemByMember(member, view_ref_id, group_type) {
     try {
+      if (!member) {
+        return false; // Skip the rest of the method if member is null or undefined
+      }
+  
       view_ref_id = shapeIntoMongooseObjectId(view_ref_id);
       const mb_id = shapeIntoMongooseObjectId(member._id);
-
+  
       const view = new View(mb_id);
-
+  
       const isValid = await view.validateChosenTarget(view_ref_id, group_type);
       console.log("isValid:::", isValid);
       assert.ok(isValid, Definer.general_err2);
-
+  
       const doesExist = await view.checkViewExistence(view_ref_id);
       console.log("doesExist::::", doesExist);
-
+  
       if (!doesExist) {
         const result = await view.insertMemberView(view_ref_id, group_type);
         assert.ok(result, Definer.general_err1);
       }
-
+  
       return true;
     } catch (err) {
       throw err;
     }
   }
-
+  
   async  getLikesCount(memberId) {
     const member = await memberModel.findById(member._id);
     return member ? member.mb_likes.length : 0;

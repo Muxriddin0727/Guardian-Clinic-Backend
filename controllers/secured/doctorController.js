@@ -16,6 +16,8 @@ doctorController.home = async (req, res) => {
   }
 };
 
+
+
 doctorController.getDoctorDshboard = async (req, res) => {
   try {
     console.log("secured/getDoctorDashboard ");

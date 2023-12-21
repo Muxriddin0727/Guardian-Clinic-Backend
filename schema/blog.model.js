@@ -48,8 +48,9 @@ const blogSchema = new mongoose.Schema(
     blog_views: {
       type: Array,
       required: false,
-      default: [].length,
+      default: [],
     },
+
     doctor_mb_id: {
       type: Schema.Types.ObjectId,
       ref: "Member",

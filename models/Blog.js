@@ -105,6 +105,7 @@ class Blog {
     }
   }
 
+  
   async getDoctorDashboardDataSecured(member) {
     try {
       console.log("member:", member);
