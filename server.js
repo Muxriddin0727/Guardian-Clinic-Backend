@@ -19,7 +19,7 @@ mongoose
     let PORT = process.env.PORT || 3002;
     server.listen(PORT, function () {
       console.log(
-        `server is running on port ${PORT}, http://localhost:${PORT}`
+        `server is running on port ${PORT}, http://46.28.44.182:${PORT}`
       );
     });
   })
