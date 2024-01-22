@@ -10,7 +10,7 @@ appointmentController.getAllAppointments = async (req, res) => {
     console.log("POST: client/getAllAppointments");
     const appointment = new Appointment();
     const result = await appointment.getAllAppointmentsData(
-      req.member,
+      req.member,  
       req.body
     );
     res.json({ state: "success", data: result });
