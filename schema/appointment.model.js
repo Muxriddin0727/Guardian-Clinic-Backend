@@ -164,10 +164,10 @@ const appointmentSchema = new mongoose.Schema(
     },
 
     doctor_id: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Member',
       required: true,
-     
-    },
+     }
   },
   { timestamps: true }
 );
