@@ -60,7 +60,7 @@ appointmentController.createAppointment = async (req, res) => {
     const { date } = req.query;
     const { slot_id, mem_id } = req.body;
 
-    //console.log(`ref_id: ${ref_id}, date: ${date}`);
+    //console.log(`ref_id: ${ref_id}, date: ${date}`); 
 
     const foundDoctor = await memberModel.findById(ref_id);
     //console.log(`foundDoctor: ${JSON.stringify(foundDoctor)}`);
@@ -72,12 +72,12 @@ appointmentController.createAppointment = async (req, res) => {
       date,
     });
 
-    //console.log(`foundAppointment: ${JSON.stringify(foundAppointment)}`);
+    //console.log(`foundAppointment: ${JSON.stringify(foundAppointment)}`); 
 
     if (!foundAppointment)
       return res.status(404).json({ message: "Appointment not found" });
 
-    if (!foundAppointment.doctor_id.equals(foundDoctor._id))
+    if (foundAppointment.doctor_id != foundDoctor._id)
       return res.status(400).json({ message: "Refered Doctor does not match" });
 
     await appointmentModel.findByIdAndUpdate(foundAppointment._id, {
@@ -96,17 +96,14 @@ appointmentController.createAppointment = async (req, res) => {
   }
 };
 
-appointmentController.getAppointmentsForUser = async (req, res) => {
+aappointmentController.getAppointmentsForUser = async (req, res) => {
   try {
     console.log("GET: client/getAppointmentsForUser");
-    const { id } = req.params;
+    const { id } = req.params; 
     console.log("id:", id);
 
     // Get all appointments
-    const appointments = await appointmentModel
-      .find()
-      .populate("slots.ref_id")
-      .populate("doctor_id");
+    const appointments = await appointmentModel.find();
     console.log("appointments", appointments);
 
     const mappedAppointments = await Promise.all(
@@ -133,13 +130,14 @@ appointmentController.getAppointmentsForUser = async (req, res) => {
         }
       })
     );
-    const filteredAppointments = mappedAppointments.filter(
-      (appointment) => appointment !== null
-    );
+    const filteredAppointments = mappedAppointments.filter(appointment => appointment !== null);
 
     console.log("mappeAppointments", mappedAppointments);
 
-    res.json({ state: "success", appointment_data: filteredAppointments[0] });
+    res.json ({state: "success", 
+      appointment_data: filteredAppointments[0],
+    });
+
   } catch (err) {
     console.log(`ERROR, secued/getDoctorDashboard , ${err.message}`);
     res.status(500).json({ message: err.message }); // send a response with the error message
