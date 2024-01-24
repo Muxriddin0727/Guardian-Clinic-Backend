@@ -96,7 +96,7 @@ appointmentController.createAppointment = async (req, res) => {
   }
 };
 
-aappointmentController.getAppointmentsForUser = async (req, res) => {
+appointmentController.getAppointmentsForUser = async (req, res) => {
   try {
     console.log("GET: client/getAppointmentsForUser");
     const { id } = req.params; 
