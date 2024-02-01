@@ -20,117 +20,81 @@ appointmentController.getAllAppointments = async (req, res) => {
   }
 };
 
-
 appointmentController.getChosenAppointment = async (req, res) => {
   try {
-     console.log("GET: client/getChosenAppointment ");
-     const { ref_id } = req.params;
-     const { date } = req.query;
-     const foundDoctor = await memberModel.findById(ref_id);
- 
-     if (!foundDoctor)
-       return res.status(404).json({ message: "Doctor not found" });
- 
-     const foundAppointment = await appointmentModel.findOne({
-       date,
-     });
- 
-     if (!foundAppointment) {
-       const createData = await appointmentModel.create({
-         date,
-         slots: default_slots.map(slot => ({
-           _id: slot._id,
-           start: slot.start,
-           end: slot.end,
-           slot_time: `${slot.start}-${slot.end}`,
-           doctor_id: foundDoctor._id,
-         })),
-       });
- 
-       return res
-         .status(200)
-         .json({ message: "Appointment created", slots: createData.slots });
-     }
- 
-     res.json({ state: "success", slots: foundAppointment.slots });
+    console.log("GET: client/getChosenAppointment ");
+    const { ref_id } = req.params;
+    const { date } = req.query;
+    const foundDoctor = await memberModel.findById(ref_id);
+
+    if (!foundDoctor)
+      return res.status(404).json({ message: "Doctor not found" });
+
+    const foundAppointment = await appointmentModel.findOne({
+      date,
+    });
+
+    if (!foundAppointment) {
+      const createData = await appointmentModel.create({
+        date,
+        doctor_id: foundDoctor._id,
+      });
+
+      return res
+        .status(200)
+        .json({ message: "Appointment created", slots: createData.slots });
+    }
+
+    res.json({ state: "success", slots: foundAppointment.slots });
   } catch (err) {
-     console.log(`ERROR, client/getChosenAppointment, ${err.message}`);
-     res.json({ state: "fail", message: err.message });
+    console.log(`ERROR, client/getChosenAppointment, ${err.message}`);
+    res.json({ state: "fail", message: err.message });
   }
- };
- 
- appointmentController.createAppointment = async (req, res) => {
+};
+
+appointmentController.createAppointment = async (req, res) => {
   try {
-     console.log("POST: client/createAppointment");
-     const { ref_id } = req.params; // doctor_id
-     const { date } = req.query;
-     const { slot_time, mem_id } = req.body; // add slot_time to the request body
- 
-     console.log(`ref_id: ${ref_id}, date: ${date}`);
- 
-     const foundDoctor = await memberModel.findById(ref_id);
-     console.log(`foundDoctor: ${JSON.stringify(foundDoctor)}`);
- 
-     if (!foundDoctor)
-       return res.status(404).json({ message: "Doctor not found" });
- 
-     const foundAppointment = await appointmentModel
-       .findOne({
-         date,
-       });
- 
-     if (!foundAppointment) {
-       // If no appointment exists for the date, create a new one
-       const createData = await appointmentModel.create({
-         date,
-         slots: default_slots.map(slot => ({
-           _id: slot._id,
-           start: slot.start,
-           end: slot.end,
-           slot_time: `${slot.start}-${slot.end}`,
-           doctor_id: foundDoctor._id,
-         })),
-       });
- 
-       return res
-         .status(200)
-         .json({ message: "Appointment created", slots: createData.slots });
-     } else {
-       // If an appointment exists for the date, check if the slot is available
-       const slot = foundAppointment.slots.find(slot => 
-         slot.start === slot_time.split('-')[0] && slot.end === slot_time.split('-')[1]
-       );
- 
-       if (slot && slot.user_id) {
-         // If the slot exists and is already booked, return an error
-         return res.status(400).json({ message: "Slot is already booked" });
-       } else if (slot) {
-         // If the slot exists and is not booked, assign the user to the slot
-         slot.user_id = mem_id;
-       } else {
-         // If the slot does not exist, create it
-         foundAppointment.slots.push({
-           start: slot_time.split('-')[0],
-           end: slot_time.split('-')[1],
-           slot_time: slot_time,
-           doctor_id: foundDoctor._id,
-           user_id: mem_id
-         });
-       }
- 
-       // Save the updated appointment
-       await foundAppointment.save();
- 
-       res.json({
-         state: "success",
-         extraMessage: "Appointment created",
-       });
-     }
+    console.log("POST: client/createAppointment");
+    const { ref_id } = req.params;
+    const { date } = req.query;
+    const { slot_id, mem_id } = req.body;
+
+    //console.log(`ref_id: ${ref_id}, date: ${date}`);
+
+    const foundDoctor = await memberModel.findById(ref_id);
+    //console.log(`foundDoctor: ${JSON.stringify(foundDoctor)}`);
+
+    if (!foundDoctor)
+      return res.status(404).json({ message: "Doctor not found" });
+
+    const foundAppointment = await appointmentModel
+      .findOne({
+        date,
+      })
+      .populate("slots.ref_id");
+    console.log(`foundAppointment: ${JSON.stringify(foundAppointment)}`);
+
+    if (!foundAppointment)
+      return res.status(404).json({ message: "Appointment not found" });
+
+    if (foundAppointment.doctor_id != foundDoctor._id)
+      return res.status(400).json({ message: "Refered Doctor does not match" });
+
+    await appointmentModel.findByIdAndUpdate(foundAppointment._id, {
+      ...foundAppointment._doc,
+      slots: foundAppointment.slots.map((value) =>
+        value._id === slot_id ? { ...value, ref_id: mem_id } : value
+      ),
+    }),
+      res.json({
+        state: "success",
+        extraMessage: "Appointment created",
+      });
   } catch (err) {
-     console.log(`ERROR, client/createAppointment, ${err.message}`);
-     res.json({ state: "fail", message: err.message });
+    console.log(`ERROR, client/createAppointment, ${err.message}`);
+    res.json({ state: "fail", message: err.message });
   }
- };
+};
 
 appointmentController.getAppointmentsForUser = async (req, res) => {
   try {
@@ -204,4 +168,29 @@ appointmentController.getAppointmentsForUser = async (req, res) => {
   }
 };
 
- 
+appointmentController.updateAppointment = async (req, res) => {
+  try {
+    console.log("POST: client/updateAppointment");
+    const appointment = new Appointment();
+    const result = await appointment.updateAppointmentData(
+      req.params.id,
+      req.body
+    );
+    res.json({ state: "success", data: result });
+  } catch (err) {
+    console.log(`ERROR, client/updateAppointment, ${err.message}`);
+    res.json({ state: "fail", message: err.message });
+  }
+};
+
+appointmentController.removeAppointment = async (req, res) => {
+  try {
+    console.log("POST: client/removeAppointment");
+    const appointment = new Appointment();
+    const result = await appointment.removeAppointmentData(req.params.id);
+    res.json({ state: "success", data: result });
+  } catch (err) {
+    console.log(`ERROR, client/removeAppointment, ${err.message}`);
+    res.json({ state: "fail", message: err.message });
+  }
+};
