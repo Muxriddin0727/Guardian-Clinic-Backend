@@ -17,7 +17,7 @@ router_client.get("/logout", registerController.logout);
 
 router_client.get('/check-token', memberController.retrieveAtuhMember, (req, res) => {
   if (req.member) {
-    res.status(200).send({ valid: true });
+    res.status(200).send({ valid: true, member: req.member });
   } else {
     res.status(500).send({ valid: false, message: 'Failed to authenticate token.' });
   }

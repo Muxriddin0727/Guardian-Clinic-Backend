@@ -28,14 +28,15 @@ memberController.retrieveAtuhMember = (req, res, next) => {
     if (authHeader) {
       const token = authHeader.split(" ")[1];
       req.member = jwt.verify(token, process.env.SECRET_TOKEN);
+      next();
+    } else {
+      res.status(401).send({ valid: false, message: 'No authorization header provided.' });
     }
-    next();
   } catch (err) {
     console.log(`ERROR, client/retrieveAtuhMember, ${err.message}`);
-    next();
+    res.status(500).send({ valid: false, message: 'Failed to authenticate token.' });
   }
 };
-
 memberController.getChosenMember = async (req, res) => {
   try {
     console.log("GET: client/getChosenMember");

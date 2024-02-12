@@ -65,7 +65,7 @@ const io = require("socket.io")(server, {
 });
 
 let online_users = 0;
-io.on("connection", function (socket) {
+io.on("connection", function (socket) { 
   online_users++;
   console.log("New user, total:", online_users);
   socket.emit("greetMsg", { text: "Welcome" });
