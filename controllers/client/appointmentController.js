@@ -2,8 +2,6 @@ const Blog = require("../../models/Blog");
 const Appointment = require("../../models/Appointment");
 const appointmentModel = require("../../schema/appointment.model");
 const memberModel = require("../../schema/member.model");
-const mongoose = require('mongoose');
-
 
 let appointmentController = module.exports;
 
@@ -109,26 +107,7 @@ appointmentController.getAppointmentsForUser = async (req, res) => {
     today.setHours(0, 0, 0, 0);
 
     // Get all appointments
-    const appointments = await appointmentModel.aggregate([
-      { $match: { slots: { $elemMatch: { ref_id: mongoose.Types.ObjectId(id) } } } },
-      { $lookup: {
-          from: "members",
-          localField: "doctor_id",
-          foreignField: "_id",
-          as: "doctor"
-        }
-      },
-      { $addFields: {
-          doctor: { $arrayElemAt: ["$doctor",  0] }
-        }
-      },
-      { $project: {
-          date:  1,
-          slots:  1,
-          doctor: "$doctor.mb_name"
-        }
-      }
-    ]);
+    const appointments = await appointmentModel.find().populate("doctor_id");
     console.log("appointments", appointments);
 
     const filteredAppointments = appointments.filter((appointment) => {
