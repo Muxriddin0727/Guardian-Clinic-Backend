@@ -110,7 +110,7 @@ appointmentController.getAppointmentsForUser = async (req, res) => {
 
     // Get all appointments
     const appointments = await appointmentModel.aggregate([
-      { $match: { "slots.ref_id": mongoose.Types.ObjectId(id) } },
+      { $match: { slots: { $elemMatch: { ref_id: mongoose.Types.ObjectId(id) } } } },
       { $lookup: {
           from: "members",
           localField: "doctor_id",
