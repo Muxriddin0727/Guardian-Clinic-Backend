@@ -42,19 +42,16 @@ router_client.get("/top-doctors", doctorController.getTopDoctors);
 
 router_client.get(
   "/category",
-  memberController.retrieveAtuhMember,
   categoryController.get_categories
 );
 
 router_client.get(
   "/category/:route_path",
-  memberController.retrieveAtuhMember,
   doctorController.get_by_category
 );
 
 router_client.get(
   "/category/:route_path/:id",
-  memberController.retrieveAtuhMember,
   doctorController.get_by_category_id
 );
 
@@ -89,7 +86,6 @@ router_client.get(
 
 router_client.get(
   "/get-doctor-blogs/:id",
-  memberController.retrieveAtuhMember,
   blogController.getDoctorBlogs
 );
 
@@ -101,7 +97,6 @@ router_client.post(
 
 router_client.post(
   "/view-blog",
-  memberController.retrieveAtuhMember,
   blogController.viewBlogChosen
 );
 
