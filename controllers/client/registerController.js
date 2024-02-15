@@ -19,7 +19,7 @@ registerController.signup = async (req, res) => {
       httpOnly: false,
     });
 
-    res.json({ state: "success", data: new_member });
+    res.json({ state: "success", data: new_member, token: token });
   } catch (err) {
     console.log(`ERROR, client/signup,  ${err.message}`);
     res.json({ state: "fail", message: err.message });
