@@ -11,10 +11,15 @@ router_secured.get("/", doctorController.home);
 //Register//
 router_secured
   .get("/sign-up", doctorController.getSignupDoctor)
-  .post(
-    "/sign-up",
-    uploader_members.single("doctor_img"),
-    registerController.signup
+  .post("/sign-up", uploader_members.single("doctor_img"), (req, res) => {
+    registerController.signup;
+
+    res.status(200).send("Form uploaded succesfully");
+  },
+  (error, req, res, next) => {
+    console.error(error);
+    res.status(500).send(error);
+  }
   );
 
 router_secured
@@ -26,18 +31,19 @@ router_secured.get("/check-me", doctorController.checkSessions);
 
 //Others//
 
-
 router_secured.get(
   "/doctor/dashboard/:date",
   doctorController.getDoctorDshboard
 );
 
-
-
-router_secured.get("/doctor/dashboard/data/:date", (req, res, next) => {
-  console.log("Request received for /doctor/dashboard/data/:date");
-  next();
-}, doctorController.getDoctorDashboardData);
+router_secured.get(
+  "/doctor/dashboard/data/:date",
+  (req, res, next) => {
+    console.log("Request received for /doctor/dashboard/data/:date");
+    next();
+  },
+  doctorController.getDoctorDashboardData
+);
 
 router_secured.post(
   "/blogs/create",

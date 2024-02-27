@@ -5,6 +5,8 @@ const app = express();
 const morgan = require("morgan");
 const router_client = require("./router_client");
 const router_secured = require("./router_secured");
+const path = require('path');
+
 
 
 const cookieParser = require("cookie-parser");
@@ -20,14 +22,15 @@ const store = new MongoDBStore({
 // 1: Kirish code
 
 app.use(express.static("public"));
-app.use("/uploads", express.static(__dirname + "/uploads"));
+app.use("/uploads", express.static(path.join(__dirname, 'uploads')));
+console.log("Uploads directory path:", __dirname + "/uploads");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 app.use(
   cors({
     credentials: true,
-    origin: true,
+    origin: 'http://guardian-clinic.uz/',
   })
 );
 app.use(cookieParser());
