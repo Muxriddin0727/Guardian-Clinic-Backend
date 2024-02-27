@@ -49,6 +49,10 @@ app.use(function (req, res, next) {
   res.locals.member = req.session.member;
   next();
 });
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
 
 // 3: Views code
 app.set("views", "views");

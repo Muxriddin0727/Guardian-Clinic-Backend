@@ -8,6 +8,9 @@ let registerController = module.exports;
 registerController.signup = async (req, res) => {
   try {
     console.log("Secured: sign_up");
+    console.log("Request body:", req.body);
+    console.log("Uploaded file:", req.file);
+
     assert(req.file, Definer.general_err3);
 
     let new_member = req.body;
@@ -22,7 +25,7 @@ registerController.signup = async (req, res) => {
     req.session.member = result;
     res.redirect("/secured/doctor/dashboard/:date");
   } catch (err) {
-    console.log(`ERROR, secured/sign_up, ${err.message}`);
+    console.error(`ERROR, secured/sign_up, ${err.message}`);
     res.json({ state: "fail", message: err.message });
   }
 };
