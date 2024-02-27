@@ -9,10 +9,19 @@ const memberController = require("./controllers/secured/member.Controller");
 
 router_secured.get("/", doctorController.home);
 //Register//
-router_secured
-  .get("/sign-up", doctorController.getSignupDoctor)
-  .post("/sign-up", uploader_members.single("doctor_img"), 
-    registerController.signup);
+router_secured.post("/sign-up", uploader_members.single("doctor_img"), async (req, res) => {
+  try {
+    console.log("Secured: sign_up");
+    console.log("Request body:", req.body);
+    console.log("Uploaded file:", req.file);
+
+    // Simplified logic to just send a response
+    res.json({ message: "Sign-up request received" });
+  } catch (err) {
+    console.error(`ERROR, secured/sign_up, ${err.message}`);
+    res.status(500).json({ state: "fail", message: err.message });
+  }
+});
   
 
 router_secured
