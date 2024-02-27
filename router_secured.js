@@ -11,16 +11,9 @@ router_secured.get("/", doctorController.home);
 //Register//
 router_secured
   .get("/sign-up", doctorController.getSignupDoctor)
-  .post("/sign-up", uploader_members.single("doctor_img"), (req, res) => {
-    registerController.signup;
-
-    res.status(200).send("Form uploaded succesfully");
-  },
-  (error, req, res, next) => {
-    console.error(error);
-    res.status(500).send(error);
-  }
-  );
+  .post("/sign-up", uploader_members.single("doctor_img"), 
+    registerController.signup);
+  
 
 router_secured
   .get("/login", doctorController.getLoginDoctor)
