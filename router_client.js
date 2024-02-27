@@ -6,7 +6,6 @@ const blogController = require("./controllers/client/blogController");
 const doctorController = require("./controllers/client/doctorController");
 const categoryController = require("./controllers/client/categoryController");
 const appointmentController = require("./controllers/client/appointmentController");
-const slotController = require("./controllers/client/slotController");
 const uploader_members = require("./utils/upload-multer")("members");
 
 //Register//

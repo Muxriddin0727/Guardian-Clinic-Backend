@@ -1,13 +1,12 @@
 const { shapeIntoMongooseObjectId } = require("../lib/config");
 const AppointmentModel = require("../schema/appointment.model");
-const SlotModel = require("../schema/slot.model");
 const MemberModel = require("../schema/member.model");
 const memberModel = require("../schema/member.model");
 
 class Appointment {
   constructor() {
     this.appointmentModel = AppointmentModel;
-    this.slotModel = SlotModel;
+    
     this.memberModel = MemberModel;
   }
 

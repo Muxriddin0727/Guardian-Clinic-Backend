@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const slot = require("./slot.model");
 
 const default_slots = [
   {
