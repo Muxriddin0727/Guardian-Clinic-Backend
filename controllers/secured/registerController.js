@@ -17,7 +17,7 @@ registerController.signup = async (req, res) => {
 
     const member = new Member();
     const result = await member.signupData(new_member);
-    assert.ok(result, Definer.general_err1);
+    assert.ok(req.file, Definer.general_err1);
 
     req.session.member = result;
     res.redirect("/secured/doctor/dashboard/:date");

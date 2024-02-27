@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const router_client = require("./router_client");
 const router_secured = require("./router_secured");
 
+
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
@@ -17,6 +18,7 @@ const store = new MongoDBStore({
 });
 
 // 1: Kirish code
+
 app.use(express.static("public"));
 app.use("/uploads", express.static(__dirname + "/uploads"));
 app.use(express.json());
